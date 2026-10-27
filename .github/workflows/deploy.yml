@@ -1,0 +1,44 @@
+# Controleert de app bij elke upload naar main en publiceert hem op GitHub Pages.
+name: Controleren en publiceren
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code ophalen
+        uses: actions/checkout@v7
+      - name: Node.js installeren
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - name: Bouwstenen installeren
+        run: npm ci
+      - name: Alle controles en bouwen
+        run: npm run check
+      - name: Pages instellen
+        uses: actions/configure-pages@v6
+      - name: Publiceerbare versie uploaden
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: ./dist
+      - name: Publiceren
+        id: deployment
+        uses: actions/deploy-pages@v5
