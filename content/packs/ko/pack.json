@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "id": "ko",
+  "version": "0.1.0",
+  "license": "CC-BY-NC-SA-4.0",
+  "language": {
+    "code": "ko",
+    "locale": "ko-KR",
+    "script": "Kore",
+    "direction": "ltr",
+    "verification": {
+      "status": "source-verified",
+      "sources": [
+        {
+          "source": "cldr-48",
+          "locator": "Waarschijnlijk schrift en schrijfrichting voor ko-KR"
+        }
+      ],
+      "checkedBy": "Claude",
+      "date": "2026-10-28",
+      "notes": "Kore is Hangul, aangevuld met Hanja. Les- en oefenstof gebruikt Hangul."
+    }
+  },
+  "names": {
+    "dutch": "Koreaans",
+    "native": "한국어",
+    "verification": {
+      "status": "source-verified",
+      "sources": [
+        {
+          "source": "cldr-48",
+          "locator": "Naam van ko in het Nederlands en in de taal zelf"
+        }
+      ],
+      "checkedBy": "Claude",
+      "date": "2026-10-28"
+    }
+  },
+  "display": {
+    "scriptName": "Hangul",
+    "glyph": "한"
+  },
+  "variant": "Standaardkoreaans (Seoul)",
+  "levels": {
+    "framework": "topik",
+    "description": "TOPIK 1 tot 6, met ERK-doelen"
+  }
+}

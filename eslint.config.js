@@ -31,4 +31,11 @@ export default defineConfig([
       ],
     },
   },
+  {
+    // De scripts draaien in Node.js, niet in de browser.
+    files: ['scripts/**/*.ts'],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
 ])

@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "id": "de",
+  "version": "0.1.0",
+  "license": "CC-BY-NC-SA-4.0",
+  "language": {
+    "code": "de",
+    "locale": "de-DE",
+    "script": "Latn",
+    "direction": "ltr",
+    "verification": {
+      "status": "source-verified",
+      "sources": [
+        {
+          "source": "cldr-48",
+          "locator": "Waarschijnlijk schrift en schrijfrichting voor de-DE"
+        }
+      ],
+      "checkedBy": "Claude",
+      "date": "2026-10-28"
+    }
+  },
+  "names": {
+    "dutch": "Duits",
+    "native": "Deutsch",
+    "verification": {
+      "status": "source-verified",
+      "sources": [
+        {
+          "source": "cldr-48",
+          "locator": "Naam van de in het Nederlands en in de taal zelf"
+        }
+      ],
+      "checkedBy": "Claude",
+      "date": "2026-10-28"
+    }
+  },
+  "display": {
+    "scriptName": "Latijns",
+    "glyph": "Ää"
+  },
+  "variant": "Standaardduits (Hochdeutsch)",
+  "levels": {
+    "framework": "cefr",
+    "description": "ERK, gericht op C2"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "my",
+  "version": "0.1.0",
+  "license": "CC-BY-NC-SA-4.0",
+  "language": {
+    "code": "my",
+    "locale": "my-MM",
+    "script": "Mymr",
+    "direction": "ltr",
+    "verification": {
+      "status": "source-verified",
+      "sources": [
+        {
+          "source": "cldr-48",
+          "locator": "Waarschijnlijk schrift en schrijfrichting voor my-MM"
+        }
+      ],
+      "checkedBy": "Claude",
+      "date": "2026-10-28"
+    }
+  },
+  "names": {
+    "dutch": "Birmaans",
+    "native": "မြန်မာဘာသာ",
+    "verification": {
+      "status": "draft",
+      "notes": "De Nederlandse naam Birmaans klopt met CLDR 48. CLDR noemt de taal မြန်မာ; de app gebruikt မြန်မာဘာသာ, letterlijk ‘de Myanmar-taal’. Een bron daarvoor is nog niet vastgelegd."
+    }
+  },
+  "display": {
+    "scriptName": "Birmaans schrift",
+    "glyph": "က"
+  },
+  "variant": "Standaardbirmaans",
+  "levels": {
+    "framework": "milestones",
+    "description": "Eigen mijlpalen"
+  }
+}

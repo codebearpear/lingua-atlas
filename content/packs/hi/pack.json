@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "hi",
+  "version": "0.1.0",
+  "license": "CC-BY-NC-SA-4.0",
+  "language": {
+    "code": "hi",
+    "locale": "hi-IN",
+    "script": "Deva",
+    "direction": "ltr",
+    "verification": {
+      "status": "source-verified",
+      "sources": [
+        {
+          "source": "cldr-48",
+          "locator": "Waarschijnlijk schrift en schrijfrichting voor hi-IN"
+        }
+      ],
+      "checkedBy": "Claude",
+      "date": "2026-10-28"
+    }
+  },
+  "names": {
+    "dutch": "Hindi",
+    "native": "हिंदी",
+    "verification": {
+      "status": "draft",
+      "notes": "De Nederlandse naam Hindi klopt met CLDR 48. CLDR schrijft de eigen naam als हिन्दी; de app gebruikt हिंदी, met anusvara. Een bron voor die spelling is nog niet vastgelegd."
+    }
+  },
+  "display": {
+    "scriptName": "Devanagari",
+    "glyph": "अ"
+  },
+  "variant": "Standaardhindi",
+  "levels": {
+    "framework": "cefr-informed",
+    "description": "Doelen naar het ERK"
+  }
+}

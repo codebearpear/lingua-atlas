@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "id": "es",
+  "version": "0.1.0",
+  "license": "CC-BY-NC-SA-4.0",
+  "language": {
+    "code": "es",
+    "locale": "es-ES",
+    "script": "Latn",
+    "direction": "ltr",
+    "verification": {
+      "status": "source-verified",
+      "sources": [
+        {
+          "source": "cldr-48",
+          "locator": "Waarschijnlijk schrift en schrijfrichting voor es-ES"
+        }
+      ],
+      "checkedBy": "Claude",
+      "date": "2026-10-28"
+    }
+  },
+  "names": {
+    "dutch": "Spaans",
+    "native": "Español",
+    "verification": {
+      "status": "source-verified",
+      "sources": [
+        {
+          "source": "cldr-48",
+          "locator": "Naam van es in het Nederlands en in de taal zelf"
+        }
+      ],
+      "checkedBy": "Claude",
+      "date": "2026-10-28",
+      "notes": "CLDR schrijft español met een kleine letter; als naam in een lijst krijgt het in de app een hoofdletter."
+    }
+  },
+  "display": {
+    "scriptName": "Latijns",
+    "glyph": "Ññ"
+  },
+  "variant": "Standaardspaans (castellano)",
+  "levels": {
+    "framework": "cefr",
+    "description": "ERK, A1 tot C2"
+  }
+}

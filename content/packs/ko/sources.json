@@ -1,0 +1,13 @@
+{
+  "sources": [
+    {
+      "id": "cldr-48",
+      "title": "Unicode CLDR 48.0 (Common Locale Data Repository)",
+      "publisher": "Unicode Consortium",
+      "url": "https://cldr.unicode.org/",
+      "kind": "standard",
+      "authoritative": true,
+      "notes": "Geraadpleegd op 28-10-2026 via ICU 78.3 in Node.js 22.23.4, met Intl.DisplayNames (taalnamen) en Intl.Locale (schrift en schrijfrichting)."
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { LANGUAGES, type LanguageCode } from './languages'
+import { LANGUAGE_CODES, LANGUAGES, type LanguageCode } from './languages'
 
 describe('LANGUAGES', () => {
   it('bevat de zeven talen van Lingua Atlas, elk één keer en in vaste volgorde', () => {
@@ -12,6 +12,13 @@ describe('LANGUAGES', () => {
       'fa',
       'my',
     ])
+  })
+
+  it('heeft voor elke taal precies één taalpakket, en geen pakket zonder taal', () => {
+    const packs = Object.keys(import.meta.glob('/content/packs/*/pack.json'))
+      .map((path) => path.split('/')[3])
+      .sort()
+    expect(packs).toEqual([...LANGUAGE_CODES].sort())
   })
 
   it('schrijft alleen Perzisch van rechts naar links', () => {

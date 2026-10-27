@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "id": "fa",
+  "version": "0.1.0",
+  "license": "CC-BY-NC-SA-4.0",
+  "language": {
+    "code": "fa",
+    "locale": "fa-IR",
+    "script": "Arab",
+    "direction": "rtl",
+    "verification": {
+      "status": "source-verified",
+      "sources": [
+        {
+          "source": "cldr-48",
+          "locator": "Waarschijnlijk schrift en schrijfrichting voor fa-IR"
+        }
+      ],
+      "checkedBy": "Claude",
+      "date": "2026-10-28"
+    }
+  },
+  "names": {
+    "dutch": "Perzisch",
+    "native": "فارسی",
+    "verification": {
+      "status": "source-verified",
+      "sources": [
+        {
+          "source": "cldr-48",
+          "locator": "Naam van fa in het Nederlands en in de taal zelf"
+        }
+      ],
+      "checkedBy": "Claude",
+      "date": "2026-10-28"
+    }
+  },
+  "display": {
+    "scriptName": "Perzisch schrift",
+    "glyph": "ف"
+  },
+  "variant": "Iraans standaardperzisch",
+  "levels": {
+    "framework": "cefr-informed",
+    "description": "Doelen naar het ERK"
+  }
+}

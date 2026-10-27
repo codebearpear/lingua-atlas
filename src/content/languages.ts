@@ -1,13 +1,25 @@
 /**
- * Basisgegevens van de zeven talen.
+ * De zeven talen van Lingua Atlas.
  *
- * Validatiestatus: Concept. Deze gegevens verhuizen in fase 3 naar de
- * taalpakketten, met bronvermelding per onderdeel.
+ * De gegevens over elke taal komen uit het manifest van het taalpakket
+ * (content/packs/<taal>/pack.json), met bronnen en validatiestatus per
+ * onderdeel; npm run pakketten controleert ze vóór elke publicatie. Hier staat
+ * alleen wat bij jou hoort: je beginniveau per taal.
  */
+import type { PackManifest } from '../packs/schema'
+
 export type LanguageCode = 'en' | 'de' | 'es' | 'ko' | 'hi' | 'fa' | 'my'
 
-/** ISO 15924-code van het schrift. */
-export type ScriptCode = 'Latn' | 'Hang' | 'Deva' | 'Arab' | 'Mymr'
+/** De volgorde waarin de app de talen toont. */
+export const LANGUAGE_CODES: readonly LanguageCode[] = [
+  'en',
+  'de',
+  'es',
+  'ko',
+  'hi',
+  'fa',
+  'my',
+]
 
 export interface Language {
   code: LanguageCode
@@ -19,7 +31,8 @@ export interface Language {
   /** Een of twee tekens die het schrift laten zien, voor het taalpictogram. */
   glyph: string
   scriptName: string
-  scriptCode: ScriptCode
+  /** Schriftcode volgens ISO 15924. */
+  scriptCode: string
   direction: 'ltr' | 'rtl'
   /** De standaardvariant die de app aanhoudt. */
   variant: string
@@ -29,96 +42,47 @@ export interface Language {
   framework: string
 }
 
-export const LANGUAGES: readonly Language[] = [
-  {
-    code: 'en',
-    locale: 'en-US',
-    dutchName: 'Engels',
-    nativeName: 'English',
-    glyph: 'Aa',
-    scriptName: 'Latijns',
-    scriptCode: 'Latn',
-    direction: 'ltr',
-    variant: 'Amerikaans Engels',
-    startLevel: 'C1, gecertificeerd (Cambridge)',
-    framework: 'ERK, gericht op C2',
-  },
-  {
-    code: 'de',
-    locale: 'de-DE',
-    dutchName: 'Duits',
-    nativeName: 'Deutsch',
-    glyph: 'Ää',
-    scriptName: 'Latijns',
-    scriptCode: 'Latn',
-    direction: 'ltr',
-    variant: 'Standaardduits (Hochdeutsch)',
-    startLevel: 'C1, gecertificeerd (Goethe-Institut)',
-    framework: 'ERK, gericht op C2',
-  },
-  {
-    code: 'es',
-    locale: 'es-ES',
-    dutchName: 'Spaans',
-    nativeName: 'Español',
-    glyph: 'Ññ',
-    scriptName: 'Latijns',
-    scriptCode: 'Latn',
-    direction: 'ltr',
-    variant: 'Standaardspaans (castellano)',
-    startLevel: 'Nog niet bepaald',
-    framework: 'ERK, A1 tot C2',
-  },
-  {
-    code: 'ko',
-    locale: 'ko-KR',
-    dutchName: 'Koreaans',
-    nativeName: '한국어',
-    glyph: '한',
-    scriptName: 'Hangul',
-    scriptCode: 'Hang',
-    direction: 'ltr',
-    variant: 'Standaardkoreaans (Seoul)',
-    startLevel: 'Nog niet bepaald',
-    framework: 'TOPIK 1 tot 6, met ERK-doelen',
-  },
-  {
-    code: 'hi',
-    locale: 'hi-IN',
-    dutchName: 'Hindi',
-    nativeName: 'हिंदी',
-    glyph: 'अ',
-    scriptName: 'Devanagari',
-    scriptCode: 'Deva',
-    direction: 'ltr',
-    variant: 'Standaardhindi',
-    startLevel: 'Nog niet bepaald',
-    framework: 'Doelen naar het ERK',
-  },
-  {
-    code: 'fa',
-    locale: 'fa-IR',
-    dutchName: 'Perzisch',
-    nativeName: 'فارسی',
-    glyph: 'ف',
-    scriptName: 'Perzisch schrift',
-    scriptCode: 'Arab',
-    direction: 'rtl',
-    variant: 'Iraans standaardperzisch',
-    startLevel: 'Nog niet bepaald',
-    framework: 'Doelen naar het ERK',
-  },
-  {
-    code: 'my',
-    locale: 'my-MM',
-    dutchName: 'Birmaans',
-    nativeName: 'မြန်မာဘာသာ',
-    glyph: 'က',
-    scriptName: 'Birmaans schrift',
-    scriptCode: 'Mymr',
-    direction: 'ltr',
-    variant: 'Standaardbirmaans',
-    startLevel: 'Nog niet bepaald',
-    framework: 'Eigen mijlpalen',
-  },
-]
+/**
+ * Jouw beginniveau per taal. Dit verhuist in fase 4 naar je eigen gegevens op
+ * het apparaat.
+ */
+const START_LEVELS: Record<LanguageCode, string> = {
+  en: 'C1, gecertificeerd (Cambridge)',
+  de: 'C1, gecertificeerd (Goethe-Institut)',
+  es: 'Nog niet bepaald',
+  ko: 'Nog niet bepaald',
+  hi: 'Nog niet bepaald',
+  fa: 'Nog niet bepaald',
+  my: 'Nog niet bepaald',
+}
+
+/** De manifesten, ingelezen tijdens het bouwen. */
+const manifests = import.meta.glob<PackManifest>('/content/packs/*/pack.json', {
+  eager: true,
+  import: 'default',
+})
+
+function manifestFor(code: LanguageCode): PackManifest {
+  const manifest = manifests[`/content/packs/${code}/pack.json`]
+  if (manifest === undefined) {
+    throw new Error(`Het taalpakket content/packs/${code} ontbreekt.`)
+  }
+  return manifest
+}
+
+export const LANGUAGES: readonly Language[] = LANGUAGE_CODES.map((code) => {
+  const { language, names, display, variant, levels } = manifestFor(code)
+  return {
+    code,
+    locale: language.locale,
+    dutchName: names.dutch,
+    nativeName: names.native,
+    glyph: display.glyph,
+    scriptName: display.scriptName,
+    scriptCode: language.script,
+    direction: language.direction,
+    variant,
+    startLevel: START_LEVELS[code],
+    framework: levels.description,
+  }
+})
