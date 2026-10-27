@@ -1,8 +1,13 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import '@fontsource-variable/inter/wght.css'
+import '@fontsource-variable/literata/wght.css'
 import './index.css'
 import App from './App.tsx'
 import { UpdatePrompt } from './app/UpdatePrompt.tsx'
+import { initTheme } from './app/themeStore'
+
+initTheme()
 
 const rootElement = document.getElementById('root')
 

@@ -2,7 +2,10 @@
 <html lang="nl">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
     <meta
       name="description"
       content="Persoonlijke taalleerapp met Nederlands als instructietaal."
@@ -12,6 +15,20 @@
     <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
     <title>Lingua Atlas</title>
+    <script>
+      // Zet het thema voordat de app laadt, zodat het scherm niet eerst licht flitst.
+      // De sleutel moet gelijk blijven aan STORAGE_KEY in src/app/themeStore.ts.
+      try {
+        var keuze = localStorage.getItem('lingua-atlas:theme')
+        var donker =
+          keuze === 'dark' ||
+          (keuze !== 'light' &&
+            matchMedia('(prefers-color-scheme: dark)').matches)
+        document.documentElement.dataset.theme = donker ? 'dark' : 'light'
+      } catch {
+        document.documentElement.dataset.theme = 'light'
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
