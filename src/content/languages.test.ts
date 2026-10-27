@@ -27,6 +27,13 @@ describe('LANGUAGES', () => {
     }
   })
 
+  it('heeft voor elke taal een teken voor het pictogram, ook in NFC', () => {
+    for (const language of LANGUAGES) {
+      expect(language.glyph.length).toBeGreaterThan(0)
+      expect(language.glyph).toBe(language.glyph.normalize('NFC'))
+    }
+  })
+
   it('heeft de eigen namen tot op het teken goed', () => {
     // Per teken uitgeschreven als code, zodat ook onzichtbare verschillen opvallen.
     const expected: Record<LanguageCode, string> = {

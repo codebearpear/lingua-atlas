@@ -20,8 +20,8 @@ export default defineConfig({
         description:
           'Persoonlijke taalleerapp met Nederlands als instructietaal.',
         lang: 'nl',
-        theme_color: '#13233a',
-        background_color: '#13233a',
+        theme_color: '#f2f2f7',
+        background_color: '#f2f2f7',
         display: 'standalone',
         icons: [
           { src: 'pwa-64x64.png', sizes: '64x64', type: 'image/png' },

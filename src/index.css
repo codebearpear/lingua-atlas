@@ -1,123 +1,183 @@
 @import 'tailwindcss';
 
 /*
- * Ontwerpsysteem van Lingua Atlas.
+ * Ontwerpsysteem van Lingua Atlas, naar de Human Interface Guidelines van Apple:
+ * gegroepeerde grijze achtergronden, witte (of donkergrijze) kaarten, zwevende
+ * glazen balken en de systeemkleuren van iOS. Waar Apple's standaardkleur te
+ * weinig contrast heeft voor kleine tekst, gebruiken we de variant met meer
+ * contrast. Alle tekstcontrasten halen WCAG AA (4,5 : 1).
  *
- * Kleuren staan als variabelen op :root. Het attribuut data-theme op <html>
- * kiest licht of donker; het opstartscript in index.html en themeStore.ts
- * zetten dat attribuut. Alle contrasten voor tekst halen WCAG AA (4,5 : 1).
+ * Het attribuut data-theme op <html> kiest licht of donker; het opstartscript
+ * in index.html en themeStore.ts zetten dat attribuut.
  */
 
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
 :root {
   color-scheme: light;
-  --paper: #f6f3ec;
-  --surface: #fffdf8;
-  --surface-muted: #efe9dd;
-  --line: #ddd4c3;
-  --line-strong: #857d6d;
-  --ink: #172131;
-  --ink-muted: #566070;
-  --brand: #13233a;
-  --on-brand: #f3ead7;
-  --accent: #765709;
-  --accent-fill: #d4a72c;
-  --on-accent: #13233a;
-  --focus: #b07d14;
+  /* systemGroupedBackground en secondarySystemGroupedBackground */
+  --canvas: #f2f2f7;
+  --surface: #ffffff;
+  /* Vlakken zoals het spoor van een segmentknop */
+  --muted: rgb(118 118 128 / 0.12);
+  --separator: rgb(60 60 67 / 0.29);
+  --label: #000000;
+  /* systemGray met meer contrast */
+  --secondary: #6c6c70;
+  /* Blauw: 4,8 : 1 op de grijze achtergrond, 5,3 : 1 voor witte tekst erop */
+  --tint: #1763e4;
+  --tint-fill: #1763e4;
+  --on-tint: #ffffff;
+  /* Glas voor de zijbalk, de tabbalk en meldingen */
+  --glass: rgb(255 255 255 / 0.72);
+  --glass-rim: rgb(255 255 255 / 0.9);
+  --glass-edge: rgb(0 0 0 / 0.08);
+  --glass-shadow: 0 10px 30px rgb(0 0 0 / 0.1);
+  /* Het gekozen deel van een segmentknop */
+  --segment: #ffffff;
+  --segment-shadow: 0 1px 3px rgb(0 0 0 / 0.12), 0 0 0 0.5px rgb(0 0 0 / 0.04);
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --paper: #0c1524;
-  --surface: #132036;
-  --surface-muted: #1a2a44;
-  --line: #2a3d5c;
-  --line-strong: #6a7c99;
-  --ink: #ece4d2;
-  --ink-muted: #a9b1bf;
-  --brand: #f3ead7;
-  --on-brand: #13233a;
-  --accent: #e2bb52;
-  --accent-fill: #d4a72c;
-  --on-accent: #13233a;
-  --focus: #e2bb52;
+  --canvas: #000000;
+  --surface: #1c1c1e;
+  --muted: rgb(118 118 128 / 0.24);
+  --separator: rgb(84 84 88 / 0.65);
+  --label: #ffffff;
+  --secondary: #aeaeb2;
+  /* Blauw met meer contrast voor tekst; vlakken houden het diepere blauw */
+  --tint: #5cb8ff;
+  --tint-fill: #1763e4;
+  --on-tint: #ffffff;
+  --glass: rgb(36 36 38 / 0.72);
+  --glass-rim: rgb(255 255 255 / 0.12);
+  --glass-edge: rgb(0 0 0 / 0.5);
+  --glass-shadow: 0 10px 30px rgb(0 0 0 / 0.5);
+  --segment: #636366;
+  --segment-shadow: 0 1px 3px rgb(0 0 0 / 0.3);
 }
 
 @theme inline {
-  --color-paper: var(--paper);
+  --color-canvas: var(--canvas);
   --color-surface: var(--surface);
-  --color-surface-muted: var(--surface-muted);
-  --color-line: var(--line);
-  --color-line-strong: var(--line-strong);
-  --color-ink: var(--ink);
-  --color-ink-muted: var(--ink-muted);
-  --color-brand: var(--brand);
-  --color-on-brand: var(--on-brand);
-  --color-accent: var(--accent);
-  --color-accent-fill: var(--accent-fill);
-  --color-on-accent: var(--on-accent);
-  --color-focus: var(--focus);
+  --color-muted: var(--muted);
+  --color-separator: var(--separator);
+  --color-label: var(--label);
+  --color-secondary: var(--secondary);
+  --color-tint: var(--tint);
+  --color-tint-fill: var(--tint-fill);
+  --color-on-tint: var(--on-tint);
+  --color-segment: var(--segment);
 }
 
 @theme {
-  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-serif: 'Literata Variable', ui-serif, Georgia, serif;
+  /* San Francisco op Apple-apparaten, Inter (meegeleverd) op Windows */
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'Inter Variable', 'Segoe UI', sans-serif;
+  /* New York op Apple-apparaten, Literata (meegeleverd) op Windows */
+  --font-serif: ui-serif, 'Literata Variable', Georgia, serif;
+
+  /* Tekststijlen van iOS bij de standaardgrootte: grootte en regelafstand */
+  --text-large-title: 2.125rem;
+  --text-large-title--line-height: 2.5625rem;
+  --text-title1: 1.75rem;
+  --text-title1--line-height: 2.125rem;
+  --text-title2: 1.375rem;
+  --text-title2--line-height: 1.75rem;
+  --text-title3: 1.25rem;
+  --text-title3--line-height: 1.5625rem;
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.375rem;
+  --text-callout: 1rem;
+  --text-callout--line-height: 1.3125rem;
+  --text-subhead: 0.9375rem;
+  --text-subhead--line-height: 1.25rem;
+  --text-footnote: 0.8125rem;
+  --text-footnote--line-height: 1.125rem;
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1rem;
+  --text-caption2: 0.6875rem;
+  --text-caption2--line-height: 0.8125rem;
+
+  --radius-card: 1.375rem;
+}
+
+/* Het glas van Apple's "Liquid Glass", benaderd met vervaging en een lichte rand */
+@utility glass {
+  background-color: var(--glass);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-rim),
+    0 0 0 0.5px var(--glass-edge),
+    var(--glass-shadow);
+}
+
+/* Wie in de instellingen van het apparaat minder transparantie kiest, krijgt een dicht vlak. */
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    background-color: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 @layer base {
   html {
-    background-color: var(--paper);
-    color: var(--ink);
-    font-family: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+    background-color: var(--canvas);
+    color: var(--label);
+    font-family:
+      -apple-system, BlinkMacSystemFont, 'Inter Variable', 'Segoe UI',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
-    text-rendering: optimizeLegibility;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
     min-height: 100dvh;
+    font-size: 1.0625rem;
+    line-height: 1.375rem;
   }
 
   :focus-visible {
-    outline: 3px solid var(--focus);
+    outline: 3px solid color-mix(in srgb, var(--tint) 70%, transparent);
     outline-offset: 2px;
   }
 
   ::selection {
-    background-color: color-mix(in srgb, var(--accent-fill) 35%, transparent);
-  }
-
-  input[type='radio'],
-  input[type='checkbox'] {
-    accent-color: var(--accent);
+    background-color: color-mix(in srgb, var(--tint) 25%, transparent);
   }
 
   /*
-   * Lettertypen per taal, via het lang-attribuut. Hindi, Perzisch en Birmaans
-   * gebruiken meegeleverde lettertypen, zodat ze offline en op elk apparaat
-   * gelijk ogen. Koreaans gebruikt het systeemlettertype: een volledig Koreaans
-   * lettertype zou de app enkele megabytes groter maken.
+   * Lettertypen per taal, via het lang-attribuut. Op Apple-apparaten kiest het
+   * systeem zijn eigen lettertype voor elk schrift; op Windows gebruiken Hindi,
+   * Perzisch en Birmaans meegeleverde lettertypen en Koreaans Malgun Gothic.
    */
   :lang(ko) {
     font-family:
-      'Inter Variable', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR',
-      sans-serif;
+      -apple-system, BlinkMacSystemFont, 'Inter Variable', 'Malgun Gothic',
+      'Noto Sans KR', sans-serif;
   }
 
   :lang(hi) {
     font-family:
-      'Noto Sans Devanagari Variable', 'Kohinoor Devanagari', 'Nirmala UI',
-      sans-serif;
+      -apple-system, BlinkMacSystemFont, 'Noto Sans Devanagari Variable',
+      'Nirmala UI', sans-serif;
   }
 
   :lang(fa) {
-    font-family: 'Vazirmatn Variable', 'Segoe UI', Tahoma, sans-serif;
+    font-family:
+      -apple-system, BlinkMacSystemFont, 'Vazirmatn Variable', 'Segoe UI',
+      Tahoma, sans-serif;
   }
 
   :lang(my) {
     font-family:
-      'Noto Sans Myanmar Variable', 'Myanmar Text', 'Myanmar Sangam MN',
-      sans-serif;
+      -apple-system, BlinkMacSystemFont, 'Noto Sans Myanmar Variable',
+      'Myanmar Text', sans-serif;
   }
 }
 

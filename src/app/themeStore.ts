@@ -2,6 +2,7 @@ import { useSyncExternalStore } from 'react'
 import {
   parseThemePreference,
   resolveTheme,
+  type Theme,
   type ThemePreference,
 } from './theme'
 
@@ -20,11 +21,18 @@ function readStoredPreference(): ThemePreference {
   }
 }
 
+/** Kleur van de titelbalk van de geïnstalleerde app, gelijk aan de achtergrond. */
+const THEME_COLORS: Record<Theme, string> = {
+  light: '#f2f2f7',
+  dark: '#000000',
+}
+
 function applyTheme(): void {
-  document.documentElement.dataset.theme = resolveTheme(
-    preference,
-    darkQuery?.matches ?? false,
-  )
+  const theme = resolveTheme(preference, darkQuery?.matches ?? false)
+  document.documentElement.dataset.theme = theme
+  document
+    .querySelector('meta[name="theme-color"]')
+    ?.setAttribute('content', THEME_COLORS[theme])
 }
 
 function notify(): void {

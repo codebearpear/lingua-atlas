@@ -10,14 +10,14 @@
       name="description"
       content="Persoonlijke taalleerapp met Nederlands als instructietaal."
     />
-    <meta name="theme-color" content="#13233a" />
+    <meta name="theme-color" content="#f2f2f7" />
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
     <title>Lingua Atlas</title>
     <script>
       // Zet het thema voordat de app laadt, zodat het scherm niet eerst licht flitst.
-      // De sleutel moet gelijk blijven aan STORAGE_KEY in src/app/themeStore.ts.
+      // De sleutel en de kleuren moeten gelijk blijven aan src/app/themeStore.ts.
       try {
         var keuze = localStorage.getItem('lingua-atlas:theme')
         var donker =
@@ -25,6 +25,9 @@
           (keuze !== 'light' &&
             matchMedia('(prefers-color-scheme: dark)').matches)
         document.documentElement.dataset.theme = donker ? 'dark' : 'light'
+        document
+          .querySelector('meta[name="theme-color"]')
+          .setAttribute('content', donker ? '#000000' : '#f2f2f7')
       } catch {
         document.documentElement.dataset.theme = 'light'
       }

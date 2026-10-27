@@ -16,6 +16,8 @@ export interface Language {
   dutchName: string
   /** De naam van de taal in de taal zelf. */
   nativeName: string
+  /** Een of twee tekens die het schrift laten zien, voor het taalpictogram. */
+  glyph: string
   scriptName: string
   scriptCode: ScriptCode
   direction: 'ltr' | 'rtl'
@@ -33,6 +35,7 @@ export const LANGUAGES: readonly Language[] = [
     locale: 'en-US',
     dutchName: 'Engels',
     nativeName: 'English',
+    glyph: 'Aa',
     scriptName: 'Latijns',
     scriptCode: 'Latn',
     direction: 'ltr',
@@ -45,6 +48,7 @@ export const LANGUAGES: readonly Language[] = [
     locale: 'de-DE',
     dutchName: 'Duits',
     nativeName: 'Deutsch',
+    glyph: 'Ää',
     scriptName: 'Latijns',
     scriptCode: 'Latn',
     direction: 'ltr',
@@ -57,6 +61,7 @@ export const LANGUAGES: readonly Language[] = [
     locale: 'es-ES',
     dutchName: 'Spaans',
     nativeName: 'Español',
+    glyph: 'Ññ',
     scriptName: 'Latijns',
     scriptCode: 'Latn',
     direction: 'ltr',
@@ -69,6 +74,7 @@ export const LANGUAGES: readonly Language[] = [
     locale: 'ko-KR',
     dutchName: 'Koreaans',
     nativeName: '한국어',
+    glyph: '한',
     scriptName: 'Hangul',
     scriptCode: 'Hang',
     direction: 'ltr',
@@ -81,6 +87,7 @@ export const LANGUAGES: readonly Language[] = [
     locale: 'hi-IN',
     dutchName: 'Hindi',
     nativeName: 'हिंदी',
+    glyph: 'अ',
     scriptName: 'Devanagari',
     scriptCode: 'Deva',
     direction: 'ltr',
@@ -93,6 +100,7 @@ export const LANGUAGES: readonly Language[] = [
     locale: 'fa-IR',
     dutchName: 'Perzisch',
     nativeName: 'فارسی',
+    glyph: 'ف',
     scriptName: 'Perzisch schrift',
     scriptCode: 'Arab',
     direction: 'rtl',
@@ -105,6 +113,7 @@ export const LANGUAGES: readonly Language[] = [
     locale: 'my-MM',
     dutchName: 'Birmaans',
     nativeName: 'မြန်မာဘာသာ',
+    glyph: 'က',
     scriptName: 'Birmaans schrift',
     scriptCode: 'Mymr',
     direction: 'ltr',

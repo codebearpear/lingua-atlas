@@ -1,31 +1,54 @@
+import { ContentUnavailable, PageHeader, SectionHeading } from '../app/ui'
 import { usePageTitle } from '../app/usePageTitle'
-import { LANGUAGES, type Language } from '../content/languages'
+import {
+  LANGUAGES,
+  type Language,
+  type LanguageCode,
+} from '../content/languages'
 
-function LanguageCard({ language }: { language: Language }) {
+/** Een kleur per taal voor het pictogram; alleen ter herkenning, zonder betekenis. */
+const TILE_COLORS: Record<LanguageCode, string> = {
+  en: 'from-[#4a8dff] to-[#1763e4]',
+  de: 'from-[#ff5a5f] to-[#e9152d]',
+  es: 'from-[#ff9a3d] to-[#c55300]',
+  ko: 'from-[#8a80ff] to-[#564ade]',
+  hi: 'from-[#2fbf68] to-[#008932]',
+  fa: 'from-[#25b9cc] to-[#008198]',
+  my: 'from-[#d660e8] to-[#b02fc2]',
+}
+
+function LanguageTile({ language }: { language: Language }) {
   return (
-    <article className="flex h-full flex-col rounded-2xl border border-line bg-surface p-5">
-      <p className="text-3xl leading-tight">
-        <span lang={language.locale} dir={language.direction}>
-          {language.nativeName}
+    <article className="flex h-full flex-col rounded-card bg-surface p-5">
+      <div className="flex items-center gap-4">
+        <span
+          aria-hidden="true"
+          lang={language.locale}
+          className={`flex size-14 shrink-0 items-center justify-center rounded-[22.5%] bg-linear-to-b text-title2 font-semibold text-white ${TILE_COLORS[language.code]}`}
+        >
+          {language.glyph}
         </span>
-      </p>
-      <h3 className="mt-2 font-semibold">{language.dutchName}</h3>
-      <dl className="mt-4 space-y-3 text-sm">
-        <div>
-          <dt className="text-ink-muted">Beginniveau</dt>
-          <dd>{language.startLevel}</dd>
+        <div className="min-w-0">
+          <h3 className="text-body font-semibold">{language.dutchName}</h3>
+          <p className="text-subhead text-secondary">
+            <span lang={language.locale} dir={language.direction}>
+              {language.nativeName}
+            </span>
+          </p>
         </div>
-        <div>
-          <dt className="text-ink-muted">Variant</dt>
-          <dd>{language.variant}</dd>
+      </div>
+      <dl className="mt-4 divide-y-[0.5px] divide-separator text-subhead">
+        <div className="flex justify-between gap-4 py-2">
+          <dt className="text-secondary">Beginniveau</dt>
+          <dd className="text-end text-balance">{language.startLevel}</dd>
         </div>
-        <div>
-          <dt className="text-ink-muted">Schrift</dt>
-          <dd>{language.scriptName}</dd>
+        <div className="flex justify-between gap-4 py-2">
+          <dt className="text-secondary">Variant</dt>
+          <dd className="text-end text-balance">{language.variant}</dd>
         </div>
       </dl>
-      <p className="mt-auto pt-5">
-        <span className="inline-flex rounded-full bg-surface-muted px-3 py-1 text-xs font-medium text-ink-muted">
+      <p className="mt-auto pt-3">
+        <span className="inline-flex rounded-full bg-muted px-2.5 py-1 text-footnote font-medium text-secondary">
           Nog geen lessen
         </span>
       </p>
@@ -37,51 +60,39 @@ export function OverviewPage() {
   usePageTitle('Overzicht')
 
   return (
-    <div className="space-y-12">
-      <header className="max-w-2xl space-y-3">
-        <h1 className="font-serif text-4xl font-semibold tracking-tight">
-          Overzicht
-        </h1>
-        <p className="text-lg leading-relaxed text-ink-muted">
+    <>
+      <PageHeader title="Overzicht">
+        <p>
           Je persoonlijke taalatlas, met het Nederlands als vertrekpunt. Lessen,
           herhalingen en statistieken komen in de volgende versies.
         </p>
-      </header>
+      </PageHeader>
 
-      <section aria-labelledby="vandaag-titel" className="space-y-4">
-        <h2
-          id="vandaag-titel"
-          className="font-serif text-2xl font-semibold tracking-tight"
-        >
-          Vandaag
-        </h2>
-        <div className="rounded-2xl border border-line bg-surface p-6">
-          <p className="font-semibold">Nog niets te herhalen</p>
-          <p className="mt-1 leading-relaxed text-ink-muted">
-            Zodra je lessen hebt gedaan, zie je hier wat je vandaag herhaalt en
-            wat je daarna het beste kunt oefenen.
-          </p>
-        </div>
-      </section>
+      <div className="space-y-10">
+        <section aria-labelledby="vandaag-titel">
+          <SectionHeading id="vandaag-titel">Vandaag</SectionHeading>
+          <div className="rounded-card bg-surface">
+            <ContentUnavailable
+              icon="calendar-check"
+              title="Nog niets te herhalen"
+            >
+              Zodra je lessen hebt gedaan, zie je hier wat je vandaag herhaalt
+              en wat je daarna het beste kunt oefenen.
+            </ContentUnavailable>
+          </div>
+        </section>
 
-      <section aria-labelledby="talen-titel" className="space-y-4">
-        <div className="flex items-baseline justify-between gap-4">
-          <h2
-            id="talen-titel"
-            className="font-serif text-2xl font-semibold tracking-tight"
-          >
-            Jouw talen
-          </h2>
-          <p className="text-sm text-ink-muted">{LANGUAGES.length} talen</p>
-        </div>
-        <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {LANGUAGES.map((language) => (
-            <li key={language.code}>
-              <LanguageCard language={language} />
-            </li>
-          ))}
-        </ul>
-      </section>
-    </div>
+        <section aria-labelledby="talen-titel">
+          <SectionHeading id="talen-titel">Jouw talen</SectionHeading>
+          <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {LANGUAGES.map((language) => (
+              <li key={language.code}>
+                <LanguageTile language={language} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
+    </>
   )
 }

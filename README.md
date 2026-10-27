@@ -20,4 +20,4 @@ Typ deze opdrachten in de terminal van VS Code, in de map `C:\Projecten\lingua-a
 
 ## Techniek
 
-React, TypeScript en Vite, als installeerbare webapp (PWA) via vite-plugin-pwa. Tests met Vitest. GitHub Actions controleert elke wijziging en publiceert naar GitHub Pages.
+React, TypeScript en Vite, als installeerbare webapp (PWA) via vite-plugin-pwa. Opmaak met Tailwind CSS, in de stijl van Apple (Human Interface Guidelines); de kleuren en tekststijlen staan in `src/index.css`. Tests met Vitest. GitHub Actions controleert elke wijziging en publiceert naar GitHub Pages.

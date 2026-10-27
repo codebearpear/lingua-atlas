@@ -28,7 +28,7 @@ export interface ScriptTest {
   direction: 'ltr' | 'rtl'
   /** Welk lettertype de app voor dit schrift gebruikt. */
   fontNote: string
-  /** Toon de voorbeelden in de schreefletter (Literata). */
+  /** Toon de voorbeelden in de leesletter (New York of Literata). */
   serif: boolean
   samples: readonly ScriptSample[]
   /** Een Nederlandse zin met een woord in dit schrift erin. */
@@ -42,7 +42,7 @@ export const SCRIPT_TESTS: readonly ScriptTest[] = [
     id: 'latin',
     title: 'Latijns schrift: Engels, Duits en Spaans',
     direction: 'ltr',
-    fontNote: 'Literata, meegeleverd',
+    fontNote: 'Leesletter: New York op Apple-apparaten, Literata op Windows',
     serif: true,
     samples: [
       {
@@ -78,7 +78,7 @@ export const SCRIPT_TESTS: readonly ScriptTest[] = [
     title: 'Hangul: Koreaans',
     direction: 'ltr',
     fontNote:
-      'Systeemlettertype: Apple SD Gothic Neo op de iPad, Malgun Gothic op Windows',
+      'Systeemlettertype: Apple SD Gothic Neo op Apple-apparaten, Malgun Gothic op Windows',
     serif: false,
     samples: [
       {
@@ -110,7 +110,7 @@ export const SCRIPT_TESTS: readonly ScriptTest[] = [
     id: 'devanagari',
     title: 'Devanagari: Hindi',
     direction: 'ltr',
-    fontNote: 'Noto Sans Devanagari, meegeleverd',
+    fontNote: 'Op Windows: Noto Sans Devanagari, meegeleverd',
     serif: false,
     samples: [
       {
@@ -150,7 +150,7 @@ export const SCRIPT_TESTS: readonly ScriptTest[] = [
     id: 'persian',
     title: 'Perzisch schrift: Perzisch (Farsi)',
     direction: 'rtl',
-    fontNote: 'Vazirmatn, meegeleverd',
+    fontNote: 'Op Windows: Vazirmatn, meegeleverd',
     serif: false,
     samples: [
       {
@@ -203,7 +203,7 @@ export const SCRIPT_TESTS: readonly ScriptTest[] = [
     id: 'myanmar',
     title: 'Birmaans schrift: Birmaans',
     direction: 'ltr',
-    fontNote: 'Noto Sans Myanmar, meegeleverd',
+    fontNote: 'Op Windows: Noto Sans Myanmar, meegeleverd',
     serif: false,
     samples: [
       {
