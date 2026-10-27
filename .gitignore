@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Werkbestanden van Claude voor npm run klaar (niet naar GitHub)
+.claude-stap.json
+.claude-verslag/

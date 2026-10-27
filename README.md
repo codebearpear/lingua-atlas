@@ -1,73 +1,23 @@
-# React + TypeScript + Vite
+# Lingua Atlas
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Persoonlijke taalleerapp voor de iPad, met Nederlands als instructietaal. De app is in ontwikkeling.
 
-Currently, two official plugins are available:
+- App: <https://codebearpear.github.io/lingua-atlas/>
+- Talen: Engels, Duits, Spaans, Koreaans, Hindi, Perzisch en Birmaans
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Werken aan het project
 
-## React Compiler
+Typ deze opdrachten in de terminal van VS Code, in de map `C:\Projecten\lingua-atlas`.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| Opdracht        | Wat het doet                                                                   |
+| --------------- | ------------------------------------------------------------------------------ |
+| `npm run klaar` | Installeren, opmaken, alles controleren, vastleggen en publiceren              |
+| `npm run dev`   | Ontwikkelversie op `http://localhost:5173/lingua-atlas/`; stoppen met Ctrl + C |
+| `npm run check` | Alleen alle controles                                                          |
+| `npm run test`  | Alleen de tests                                                                |
 
-## Expanding the ESLint configuration
+`npm run klaar` legt alleen iets vast en publiceert alleen als alle controles slagen. Het verslag van de laatste keer staat in `.claude-verslag/laatste.txt`.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Techniek
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+React, TypeScript en Vite, als installeerbare webapp (PWA) via vite-plugin-pwa. Tests met Vitest. GitHub Actions controleert elke wijziging en publiceert naar GitHub Pages.

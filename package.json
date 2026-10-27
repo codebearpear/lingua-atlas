@@ -12,7 +12,8 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check": "npm run lint && npm run build && npm run test && npm run format:check"
+    "check": "npm run lint && npm run build && npm run test && npm run format:check",
+    "klaar": "node scripts/klaar.mjs"
   },
   "dependencies": {
     "react": "^19.3.1",
