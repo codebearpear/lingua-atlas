@@ -38,6 +38,13 @@ const NAV_ICON_PATHS: Record<RouteId, ReactNode> = {
       <path d="m15.5 8.5-2 5-5 2 2-5z" />
     </>
   ),
+  // Letter A met een streep eronder
+  scripts: (
+    <>
+      <path d="m6 16 4.5-11h1L16 16M7.6 12h6.8" />
+      <path d="M4 20h16" />
+    </>
+  ),
   // Schuifregelaars
   settings: (
     <>

@@ -13,6 +13,10 @@ describe('routeFromHash', () => {
     expect(routeFromHash('#/instellingen/')).toBe('settings')
   })
 
+  it('herkent de schrifttest', () => {
+    expect(routeFromHash('#/schrifttest')).toBe('scripts')
+  })
+
   it('geeft null bij een pagina die niet bestaat', () => {
     expect(routeFromHash('#/bestaat-niet')).toBeNull()
   })
@@ -21,6 +25,7 @@ describe('routeFromHash', () => {
 describe('hrefFor', () => {
   it('maakt een link met # ervoor', () => {
     expect(hrefFor('overview')).toBe('#/')
+    expect(hrefFor('scripts')).toBe('#/schrifttest')
     expect(hrefFor('settings')).toBe('#/instellingen')
   })
 })

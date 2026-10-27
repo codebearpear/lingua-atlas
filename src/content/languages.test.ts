@@ -28,19 +28,19 @@ describe('LANGUAGES', () => {
   })
 
   it('heeft de eigen namen tot op het teken goed', () => {
-    // Per teken uitgeschreven, zodat ook onzichtbare verschillen opvallen.
+    // Per teken uitgeschreven als code, zodat ook onzichtbare verschillen opvallen.
     const expected: Record<LanguageCode, string> = {
       en: 'English',
       de: 'Deutsch',
-      es: 'Español',
-      // 한국어
-      ko: '한국어',
-      // हिंदी: met anusvara (U+0902), zoals in de standaardspelling
-      hi: 'हिंदी',
-      // فارسی: met de Perzische ye (U+06CC), niet de Arabische (U+064A)
-      fa: 'فارسی',
-      // မြန်မာဘာသာ: medial ra (U+103C) direct na de medeklinker
-      my: 'မြန်မာဘာသာ',
+      es: 'Espa\u00f1ol',
+      // Koreaans: han-guk-eo
+      ko: '\ud55c\uad6d\uc5b4',
+      // Hindi: met anusvara (U+0902), zoals in de standaardspelling
+      hi: '\u0939\u093f\u0902\u0926\u0940',
+      // Perzisch: met de Perzische ye (U+06CC), niet de Arabische (U+064A)
+      fa: '\u0641\u0627\u0631\u0633\u06cc',
+      // Birmaans: medial ra (U+103C) direct na de medeklinker
+      my: '\u1019\u103c\u1014\u103a\u1019\u102c\u1018\u102c\u101e\u102c',
     }
     for (const language of LANGUAGES) {
       expect(language.nativeName).toBe(expected[language.code])

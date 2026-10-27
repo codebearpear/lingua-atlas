@@ -4,6 +4,7 @@ import { routeFromHash } from './app/routes'
 import { useHashLocation } from './app/useHashLocation'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { OverviewPage } from './pages/OverviewPage'
+import { ScriptTestPage } from './pages/ScriptTestPage'
 import { SettingsPage } from './pages/SettingsPage'
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
   return (
     <AppShell current={route}>
       {route === 'overview' && <OverviewPage />}
+      {route === 'scripts' && <ScriptTestPage />}
       {route === 'settings' && <SettingsPage />}
       {route === null && <NotFoundPage />}
     </AppShell>

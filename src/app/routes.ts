@@ -5,7 +5,7 @@
  * Zo werkt elke pagina ook op GitHub Pages en zonder internet, zonder extra
  * instellingen op de server.
  */
-export type RouteId = 'overview' | 'settings'
+export type RouteId = 'overview' | 'scripts' | 'settings'
 
 export interface Route {
   id: RouteId
@@ -15,6 +15,7 @@ export interface Route {
 
 export const ROUTES: readonly Route[] = [
   { id: 'overview', path: '/', label: 'Overzicht' },
+  { id: 'scripts', path: '/schrifttest', label: 'Schrifttest' },
   { id: 'settings', path: '/instellingen', label: 'Instellingen' },
 ]
 

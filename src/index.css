@@ -91,6 +91,34 @@
   input[type='checkbox'] {
     accent-color: var(--accent);
   }
+
+  /*
+   * Lettertypen per taal, via het lang-attribuut. Hindi, Perzisch en Birmaans
+   * gebruiken meegeleverde lettertypen, zodat ze offline en op elk apparaat
+   * gelijk ogen. Koreaans gebruikt het systeemlettertype: een volledig Koreaans
+   * lettertype zou de app enkele megabytes groter maken.
+   */
+  :lang(ko) {
+    font-family:
+      'Inter Variable', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR',
+      sans-serif;
+  }
+
+  :lang(hi) {
+    font-family:
+      'Noto Sans Devanagari Variable', 'Kohinoor Devanagari', 'Nirmala UI',
+      sans-serif;
+  }
+
+  :lang(fa) {
+    font-family: 'Vazirmatn Variable', 'Segoe UI', Tahoma, sans-serif;
+  }
+
+  :lang(my) {
+    font-family:
+      'Noto Sans Myanmar Variable', 'Myanmar Text', 'Myanmar Sangam MN',
+      sans-serif;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
