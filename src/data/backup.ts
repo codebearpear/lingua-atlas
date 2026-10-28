@@ -7,7 +7,7 @@
  * is. Het controleren van een bestand staat apart in readBackup.ts, zodat de
  * app die code pas laadt als je een back-up terugzet.
  */
-import type { ThemePreference } from '../app/theme'
+import { THEME_LABELS, type ThemePreference } from '../app/theme'
 
 export const BACKUP_FORMAT = 'lingua-atlas-backup'
 
@@ -108,4 +108,46 @@ export function backupFileName(now: Date, timeZone?: string): string {
   const part = (type: Intl.DateTimeFormatPartTypes) =>
     parts.find((found) => found.type === type)?.value ?? '00'
   return `lingua-atlas-backup-${part('year')}-${part('month')}-${part('day')}-${part('hour')}${part('minute')}.json`
+}
+
+export interface BackupDescription {
+  /** Wanneer de back-up is gemaakt, in de tijd van het apparaat. */
+  made: string
+  /** De versie van de app die hem maakte. */
+  version: string
+  /** Wat erin staat, in gewone taal. */
+  contents: string[]
+  /** Of er records uit de database in staan; dan valt er te kiezen tussen samenvoegen en vervangen. */
+  hasRecords: boolean
+}
+
+/** Wat er in een back-up staat, om te tonen voordat je hem terugzet. */
+export function describeBackup(
+  backup: Backup,
+  timeZone?: string,
+): BackupDescription {
+  const time = new Intl.DateTimeFormat('nl-NL', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+    timeZone,
+  })
+  const contents: string[] = []
+  if (backup.settings.theme !== undefined) {
+    contents.push(
+      `instellingen (thema ${THEME_LABELS[backup.settings.theme].toLowerCase()})`,
+    )
+  }
+  for (const [name, records] of Object.entries(backup.tables)) {
+    if (records.length > 0) {
+      contents.push(`${name}: ${records.length}`)
+    }
+  }
+  return {
+    made: time.format(Date.parse(backup.createdAt)),
+    version: backup.app.version,
+    contents,
+    hasRecords: Object.values(backup.tables).some(
+      (records) => records.length > 0,
+    ),
+  }
 }

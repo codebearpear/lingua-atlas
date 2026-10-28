@@ -45,8 +45,18 @@ Welke tabellen meegaan, staat in `BACKUP_TABLES` in `src/data/backupStore.ts`. H
 
 Inspringing en de volgorde van de sleutels in het bestand tellen dus niet mee; elke andere wijziging wel. Het controlegetal ontdekt een beschadigd of half opgeslagen bestand. Het is geen beveiliging: wie het bestand aanpast, kan ook een nieuw controlegetal uitrekenen.
 
+## Terugzetten
+
+De app controleert eerst het bestand: geldige JSON, het juiste formaat, versies die hij kent en een kloppend controlegetal (`src/data/readBackup.ts`). Daarna laat hij zien wat erin staat. Pas na jouw keuze verandert er iets, in één transactie: lukt een deel niet, dan verandert er niets (`src/data/restore.ts`).
+
+- **Vervangen:** de tabellen uit `BACKUP_TABLES` worden leeggemaakt en gevuld met de records uit de back-up. De instellingen worden die uit de back-up.
+- **Samenvoegen:** records uit de back-up komen erbij. Staat een record met dezelfde sleutel al op het apparaat, dan wint het record met de hoogste `updatedAt`. Bij gelijk, of als een van beide geen `updatedAt` heeft, blijft het record op het apparaat. De instellingen van het apparaat blijven.
+
+Staan er geen records in de back-up, dan valt er niets te kiezen en zet de app alleen de instellingen terug. Tabellen die de app niet kent, slaat hij over. Een tabel in `BACKUP_TABLES` heeft de sleutel in elk record zelf, en elk record heeft een `updatedAt` in milliseconden sinds 1970.
+
 ## Versies
 
+- Elke wijziging in de velden van het bestand krijgt een nieuwe `formatVersion`. Een oudere app herkent het bestand dan als nieuwer, in plaats van het als kapot te zien.
 - Een bestand met een hogere `formatVersion` of `database.version` dan de app kent, weigert de app: werk dan eerst de app bij.
 - Komt er een nieuwe formaatversie, dan blijft de app de oudere versies lezen.
 - Komt er een nieuwe databaseversie, dan zet de app de gegevens uit een oudere back-up bij het herstellen om, met dezelfde stappen als de database zelf.

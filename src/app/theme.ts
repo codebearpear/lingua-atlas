@@ -10,6 +10,13 @@ export const THEME_PREFERENCES: readonly ThemePreference[] = [
   'dark',
 ]
 
+/** De namen van de keuzes, zoals in Instellingen. */
+export const THEME_LABELS: Record<ThemePreference, string> = {
+  system: 'Automatisch',
+  light: 'Licht',
+  dark: 'Donker',
+}
+
 /** Maakt van een opgeslagen waarde een geldige keuze; onbekend wordt 'system'. */
 export function parseThemePreference(value: unknown): ThemePreference {
   return value === 'light' || value === 'dark' ? value : 'system'

@@ -28,6 +28,8 @@
   --tint: #1763e4;
   --tint-fill: #1763e4;
   --on-tint: #ffffff;
+  /* Rood voor acties die iets weghalen: 5,4 : 1 op wit */
+  --destructive: #d70015;
   /* Glas voor de zijbalk, de tabbalk en meldingen */
   --glass: rgb(255 255 255 / 0.72);
   --glass-rim: rgb(255 255 255 / 0.9);
@@ -50,6 +52,7 @@
   --tint: #5cb8ff;
   --tint-fill: #1763e4;
   --on-tint: #ffffff;
+  --destructive: #ff6961;
   --glass: rgb(36 36 38 / 0.72);
   --glass-rim: rgb(255 255 255 / 0.12);
   --glass-edge: rgb(0 0 0 / 0.5);
@@ -68,6 +71,7 @@
   --color-tint: var(--tint);
   --color-tint-fill: var(--tint-fill);
   --color-on-tint: var(--on-tint);
+  --color-destructive: var(--destructive);
   --color-segment: var(--segment);
 }
 

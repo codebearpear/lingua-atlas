@@ -50,7 +50,7 @@ In de app staat onder Instellingen, bij Taalpakketten, per taal wat het pakket b
 Lingua Atlas bewaart alles op je eigen apparaat, in de database van de browser (IndexedDB, via Dexie; zie `src/data/database.ts`). Er gaat niets naar een server. Onder Instellingen zie je:
 
 - **Opslag:** hoeveel ruimte de app gebruikt, de bovengrens van de browser en of de browser je gegevens blijvend bewaart. De geïnstalleerde app vraagt dat bij het opstarten zelf aan.
-- **Back-up:** één bestand met je gegevens, om buiten de app te bewaren. Op de pc download je het; op de iPad kun je het delen en in Bestanden bewaren. Het formaat staat in [`docs/backup-format.md`](docs/backup-format.md). Terugzetten kan nog niet; dat volgt.
+- **Back-up:** één bestand met je gegevens, om buiten de app te bewaren. Op de pc download je het; op de iPad kun je het delen en in Bestanden bewaren. Bij terugzetten controleert de app het bestand en laat zien wat erin staat, voordat er iets verandert. Het formaat staat in [`docs/backup-format.md`](docs/backup-format.md).
 - **Foutenlogboek:** gaat er iets mis, dan komt de melding hier. Kopieer het logboek en geef het aan Claude. Loopt de app vast, dan zie je een uitleg in plaats van een leeg scherm.
 - **Versie:** de commit waaruit GitHub de app heeft gebouwd.
 

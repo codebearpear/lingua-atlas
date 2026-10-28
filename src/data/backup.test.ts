@@ -4,6 +4,7 @@ import {
   BACKUP_FORMAT_VERSION,
   canonicalJson,
   createBackup,
+  describeBackup,
   serializeBackup,
   sha256Hex,
   type BackupInput,
@@ -133,5 +134,31 @@ describe('readBackup', () => {
     expect(
       await readBackup(serializeBackup(newerDatabase), READ),
     ).toMatchObject({ ok: false, problem: 'version' })
+  })
+})
+
+describe('describeBackup', () => {
+  it('beschrijft een back-up met alleen instellingen', async () => {
+    expect(
+      describeBackup(await createBackup(input()), 'Europe/Amsterdam'),
+    ).toEqual({
+      made: '28-10-2026, 12:30',
+      version: 'f9208d5',
+      contents: ['instellingen (thema donker)'],
+      hasRecords: false,
+    })
+  })
+
+  it('telt de records per tabel', async () => {
+    const backup = await createBackup(
+      input({
+        settings: {},
+        tables: { kaarten: [{ id: 'a' }, { id: 'b' }], leeg: [] },
+      }),
+    )
+    expect(describeBackup(backup, 'Europe/Amsterdam')).toMatchObject({
+      contents: ['kaarten: 2'],
+      hasRecords: true,
+    })
   })
 })

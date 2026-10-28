@@ -1,7 +1,7 @@
 import { BackupSection } from '../app/BackupSection'
 import { LogSection } from '../app/LogSection'
 import { StorageSection } from '../app/StorageSection'
-import { THEME_PREFERENCES, type ThemePreference } from '../app/theme'
+import { THEME_LABELS, THEME_PREFERENCES } from '../app/theme'
 import { setThemePreference, useThemePreference } from '../app/themeStore'
 import { GroupedRow, GroupedSection, PageHeader } from '../app/ui'
 import { usePageTitle } from '../app/usePageTitle'
@@ -9,12 +9,6 @@ import { BUILD_ID } from '../app/version'
 import { LANGUAGES, type Language } from '../content/languages'
 import { packSummary } from '../content/packs'
 import { STATUS_LABELS, lowestStatus, type PackCounts } from '../packs/summary'
-
-const THEME_LABELS: Record<ThemePreference, string> = {
-  system: 'Automatisch',
-  light: 'Licht',
-  dark: 'Donker',
-}
 
 /** Een segmentknop zoals in iOS, gebouwd op gewone keuzerondjes. */
 function ThemeSegments() {
