@@ -32,6 +32,8 @@ Elke taal heeft een eigen pakket in `content/packs/<taal>/`:
 
 Het formaat staat in `src/packs/schema.ts`, de regels in `src/packs/check.ts`. `npm run pakketten` controleert alle pakketten, ook binnen `npm run check` en op GitHub. Een fout houdt publicatie tegen; een waarschuwing niet, maar het onderdeel blijft dan op Concept staan.
 
+De controle kijkt ook per taal naar het schrift: tekst in de doeltaal hoort in het eigen schrift te staan, met bijvoorbeeld de Perzische ی en ک en de halve spatie, de danda in het Hindi, ¿ en ¡ in het Spaans, en geen tekens die op Zawgyi-codering wijzen in het Birmaans.
+
 Elk onderdeel heeft een validatiestatus:
 
 - **Concept:** opgesteld, nog niet gecontroleerd.

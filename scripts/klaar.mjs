@@ -5,7 +5,9 @@
 // 1. Verwijdert bestanden die Claude in .claude-stap.json noemt. Dat kan
 //    alleen bij bestanden die al in een bewaarpunt staan, zodat ze altijd
 //    terug te halen zijn.
-// 2. Installeert de bouwstenen, plus nieuwe als Claude die noemt.
+// 2. Installeert de bouwstenen, plus nieuwe als Claude die noemt. Daarna
+//    zet het de beveiligingsmeldingen van npm in het verslag; die houden niets
+//    tegen, Claude beoordeelt ze.
 // 3. Maakt alle bestanden netjes op (Prettier).
 // 4. Draait alle controles (npm run check).
 // 5. Alleen als alles slaagt: legt de wijzigingen vast (commit) en stuurt ze
@@ -178,6 +180,24 @@ async function maakKopieVoorClaude() {
   }
 }
 
+/** Zet de beveiligingsmeldingen van npm in het verslag. Ze houden de stap niet tegen. */
+async function bekijkBeveiliging() {
+  noteer()
+  noteer('▶ Beveiligingsmeldingen van npm bekijken')
+  noteer('  > npm audit')
+  const { code, uitvoer } = await voerUit('npm audit', { stil: true })
+  verslag.push(uitvoer.trimEnd())
+  if (code === 0) {
+    noteer('✓ Geen bekende beveiligingsproblemen.')
+  } else if (/vulnerabilit/i.test(uitvoer)) {
+    noteer(
+      '! npm meldt beveiligingsproblemen; de details staan in het verslag. Claude bekijkt ze. De stap gaat gewoon door.',
+    )
+  } else {
+    noteer('! npm audit lukte niet; de stap gaat gewoon door.')
+  }
+}
+
 async function voerStapUit() {
   noteer(`Lingua Atlas: npm run klaar (${new Date().toLocaleString('nl-NL')})`)
 
@@ -236,6 +256,14 @@ async function voerStapUit() {
   } catch (fout) {
     noteer(
       `! De kopie voor Claude lukte niet (${fout instanceof Error ? fout.message : String(fout)}); de stap gaat gewoon door.`,
+    )
+  }
+
+  try {
+    await bekijkBeveiliging()
+  } catch (fout) {
+    noteer(
+      `! De beveiligingscontrole lukte niet (${fout instanceof Error ? fout.message : String(fout)}); de stap gaat gewoon door.`,
     )
   }
 

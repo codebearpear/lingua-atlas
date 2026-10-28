@@ -433,6 +433,103 @@ describe('checkPack', () => {
   })
 })
 
+describe('checkPack: taal en schrift', () => {
+  it('controleert de doeltaal in woorden en zinnen', () => {
+    const pack = fullPack()
+    const [hola] = pack['vocabulary.json'].words
+    if (hola !== undefined) {
+      hola.text = 'h\u043ela'
+    }
+    const [sentence] = pack['sentences.json'].sentences
+    if (sentence !== undefined) {
+      sentence.text = '\u00a1Hola! Qu\u00e9 tal?'
+    }
+    expect(messages(check(pack))).toEqual([
+      'vocabulary.json › words[0].text: Letter uit een ander schrift: "\u043e" (U+043E) is Cyrillisch.',
+      'sentences.json › sentences[0].text: Een Spaanse vraag begint met \u00BF.',
+    ])
+  })
+
+  it('kijkt bij herkennen naar de opgave en bij produceren naar de antwoorden', () => {
+    const pack = fullPack()
+    const [recognize, produce] = firstLesson(pack).exercises
+    if (recognize !== undefined) {
+      recognize.prompt = 'h\u043ela'
+    }
+    if (produce !== undefined) {
+      produce.answers = ['ad\u0456\u00f3s']
+    }
+    const where = 'units/a1-begroeten.json › lessons[0]'
+    expect(messages(check(pack))).toEqual([
+      `${where}.exercises[0].prompt: Letter uit een ander schrift: "\u043e" (U+043E) is Cyrillisch.`,
+      `${where}.exercises[1].answers[0]: Letter uit een ander schrift: "\u0456" (U+0456) is Cyrillisch.`,
+    ])
+  })
+
+  it('laat bekende foute antwoorden met rust', () => {
+    const pack = fullPack()
+    const [, produce] = firstLesson(pack).exercises
+    if (produce !== undefined) {
+      produce.feedback = [
+        {
+          answer: "adio's",
+          errorType: 'spelling',
+          message: 'Zonder apostrof.',
+        },
+        {
+          answer: 'ad\u0456os',
+          errorType: 'script',
+          message: 'Dat is een Cyrillische i.',
+        },
+      ]
+    }
+    expect(messages(check(pack))).toEqual([])
+  })
+
+  it('controleert Perzische tekens in Perzische tekst, niet in Nederlandse uitleg', () => {
+    const report = check(
+      {
+        'pack.json': {
+          ...baseManifest(),
+          id: 'fa',
+          language: {
+            code: 'fa',
+            locale: 'fa-IR',
+            script: 'Arab',
+            direction: 'rtl',
+          },
+          names: {
+            dutch: 'Perzisch',
+            native: '\u0641\u0627\u0631\u0633\u06cc',
+          },
+          display: { scriptName: 'Perzisch schrift', glyph: '\u0641' },
+          variant: 'Iraans standaardperzisch',
+          levels: {
+            framework: 'cefr-informed',
+            description: 'Doelen naar het ERK',
+          },
+        },
+        'vocabulary.json': {
+          words: [
+            {
+              id: 'ketab',
+              // ketab, geschreven met de Arabische kaf
+              text: '\u0643\u062a\u0627\u0628',
+              translations: ['boek'],
+              partOfSpeech: 'noun',
+              notes: 'Schrijf niet \u0643 (Arabische kaf), maar \u06a9.',
+            },
+          ],
+        },
+      },
+      'fa',
+    )
+    expect(messages(report)).toEqual([
+      'vocabulary.json › words[0].text: Arabische kaf \u0643 (U+0643). Gebruik de Perzische kaf \u06A9 (U+06A9).',
+    ])
+  })
+})
+
 describe('checkText', () => {
   it('staat gewone tekst in elk schrift toe, ook met een halve spatie', () => {
     // Perzisch mi-khaham met ZWNJ (U+200C), Koreaans hangugeo, Hindi namaste

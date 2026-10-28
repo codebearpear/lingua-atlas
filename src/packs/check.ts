@@ -25,8 +25,11 @@ import {
   type Unit,
   type Verification,
 } from './schema.ts'
+import { rulesFor } from './scripts.ts'
+import { checkText, type Severity, type TextProblem } from './text.ts'
 
-export type Severity = 'error' | 'warning'
+export { checkText } from './text.ts'
+export type { Severity } from './text.ts'
 
 export interface Issue {
   severity: Severity
@@ -231,6 +234,11 @@ function itemIdAt(
   return undefined
 }
 
+/** Een bekend fout antwoord in een oefening, met opzet fout. */
+function isFeedbackAnswer(path: readonly PropertyKey[]): boolean {
+  return path.at(-1) === 'answer' && path.at(-3) === 'feedback'
+}
+
 function walkStrings(
   value: unknown,
   path: PropertyKey[],
@@ -247,78 +255,6 @@ function walkStrings(
       walkStrings(item, [...path, key], visit)
     }
   }
-}
-
-function codePoint(char: string): string {
-  const code = char.codePointAt(0) ?? 0
-  return `U+${code.toString(16).toUpperCase().padStart(4, '0')}`
-}
-
-/** Het eerste stuurteken in de tekst, zoals een tab of regeleinde. */
-function findControlChar(text: string): string | undefined {
-  for (const char of text) {
-    const code = char.codePointAt(0) ?? 0
-    if (code <= 0x1f || (code >= 0x7f && code <= 0x9f)) {
-      return char
-    }
-  }
-  return undefined
-}
-
-/** Richtingstekens; de richting hoort bij lang en dir in de app. */
-const BIDI_CHAR = /[\u061C\u200E\u200F\u202A-\u202E\u2066-\u2069]/u
-/** Onzichtbare tekens die zelden bedoeld zijn: zacht afbreekstreepje, spatie zonder breedte, woordbinder, BOM. */
-const INVISIBLE_CHAR = /[\u00AD\u200B\u2060\uFEFF]/u
-
-interface TextProblem {
-  severity: Severity
-  message: string
-}
-
-/** Regels voor elke tekst in een pakket, in welke taal ook. */
-export function checkText(text: string): TextProblem[] {
-  const problems: TextProblem[] = []
-  if (text !== text.normalize('NFC')) {
-    problems.push({
-      severity: 'error',
-      message:
-        'Niet in Unicode-normaalvorm NFC. Sla de tekst op als NFC, zodat elk teken één vaste code heeft.',
-    })
-  }
-  if (text !== text.trim()) {
-    problems.push({
-      severity: 'error',
-      message: 'Spatie of regeleinde aan het begin of eind.',
-    })
-  }
-  const control = findControlChar(text)
-  if (control !== undefined) {
-    problems.push({
-      severity: 'error',
-      message: `Bevat een stuurteken (${codePoint(control)}), zoals een tab of regeleinde. Zet losse alinea's in aparte velden.`,
-    })
-  }
-  if (text.includes('  ')) {
-    problems.push({
-      severity: 'warning',
-      message: 'Twee spaties achter elkaar.',
-    })
-  }
-  const bidi = BIDI_CHAR.exec(text)
-  if (bidi !== null) {
-    problems.push({
-      severity: 'warning',
-      message: `Bevat een onzichtbaar richtingsteken (${codePoint(bidi[0])}). De app regelt de richting zelf met lang en dir.`,
-    })
-  }
-  const invisible = INVISIBLE_CHAR.exec(text)
-  if (invisible !== null) {
-    problems.push({
-      severity: 'warning',
-      message: `Bevat een onzichtbaar teken (${codePoint(invisible[0])}). Is dat bedoeld?`,
-    })
-  }
-  return problems
 }
 
 function allowedLevels(levels: PackManifest['levels']): readonly string[] {
@@ -407,7 +343,8 @@ export function checkPack(input: PackInput, options: CheckOptions): PackReport {
   // 2. Regels voor alle tekst
   for (const [file, data] of parsed) {
     walkStrings(data, [], (text, path) => {
-      for (const problem of checkText(text)) {
+      const typography = !isFeedbackAnswer(path)
+      for (const problem of checkText(text, { typography })) {
         add(
           problem.severity,
           file,
@@ -863,7 +800,100 @@ export function checkPack(input: PackInput, options: CheckOptions): PackReport {
     })
   }
 
-  // 10. Statussen
+  // 10. Taal en schrift
+  if (manifest !== undefined) {
+    const rules = rulesFor(manifest.language)
+    const report = (
+      problems: readonly TextProblem[],
+      file: string,
+      path: string,
+      itemId: string | undefined,
+    ): void => {
+      for (const found of problems) {
+        add(found.severity, file, path, found.message, itemId)
+      }
+    }
+
+    // Tekst in de doeltaal. Nederlandse tekst valt hier buiten: uitleg mag
+    // bijvoorbeeld de Arabische kaf noemen om het verschil te laten zien.
+    const target = (
+      text: string,
+      file: string,
+      path: string,
+      itemId: string,
+      sentence = false,
+    ): void => {
+      report(rules.target(text), file, path, itemId)
+      report(rules.characters(text), file, path, itemId)
+      if (sentence) {
+        report(rules.sentence(text), file, path, itemId)
+      }
+    }
+    const romanized = (
+      text: string | undefined,
+      file: string,
+      path: string,
+      itemId: string,
+    ): void => {
+      if (text !== undefined) {
+        report(rules.romanization(text), file, path, itemId)
+      }
+    }
+
+    target(manifest.names.native, 'pack.json', 'names.native', MANIFEST_NAMES)
+    words.forEach((word, index) => {
+      target(word.text, 'vocabulary.json', `words[${index}].text`, word.id)
+      romanized(
+        word.transliteration,
+        'vocabulary.json',
+        `words[${index}].transliteration`,
+        word.id,
+      )
+    })
+    sentences.forEach((sentence, index) => {
+      const path = `sentences[${index}]`
+      target(sentence.text, 'sentences.json', `${path}.text`, sentence.id, true)
+      romanized(
+        sentence.transliteration,
+        'sentences.json',
+        `${path}.transliteration`,
+        sentence.id,
+      )
+    })
+    for (const { file, unit } of units) {
+      unit.lessons.forEach((lesson, lessonIndex) => {
+        lesson.exercises?.forEach((exercise, exerciseIndex) => {
+          const path = `lessons[${lessonIndex}].exercises[${exerciseIndex}]`
+          // Herkennen: de opgave staat in de doeltaal. Produceren: de antwoorden.
+          if (exercise.direction === 'to-dutch') {
+            target(exercise.prompt, file, `${path}.prompt`, exercise.id)
+            return
+          }
+          if (exercise.type === 'multiple-choice') {
+            exercise.choices.forEach((choice, choiceIndex) => {
+              target(
+                choice.text,
+                file,
+                `${path}.choices[${choiceIndex}].text`,
+                exercise.id,
+              )
+            })
+          } else {
+            exercise.answers.forEach((answer, answerIndex) => {
+              target(
+                answer,
+                file,
+                `${path}.answers[${answerIndex}]`,
+                exercise.id,
+              )
+            })
+          }
+        })
+      })
+    }
+  }
+
+  // 11. Statussen
   const flagged = new Set(
     issues.flatMap((issue) =>
       issue.itemId === undefined ? [] : [issue.itemId],
