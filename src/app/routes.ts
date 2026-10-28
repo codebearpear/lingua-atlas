@@ -27,10 +27,11 @@ export type Page =
   | { page: RouteId }
   | { page: 'course'; language: LanguageCode }
   | { page: 'lesson'; language: LanguageCode; lesson: string }
+  | { page: 'practice'; language: LanguageCode; lesson: string }
 
 const ID = '[a-z0-9]+(?:-[a-z0-9]+)*'
 const COURSE = /^\/taal\/([a-z]+)$/u
-const LESSON = new RegExp(`^/taal/([a-z]+)/les/(${ID})$`, 'u')
+const LESSON = new RegExp(`^/taal/([a-z]+)/les/(${ID})(/oefenen)?$`, 'u')
 
 /** Zet de hash uit de adresbalk om naar een pagina, of `null` als die niet bestaat. */
 export function pageFromHash(hash: string): Page | null {
@@ -53,7 +54,11 @@ export function pageFromHash(hash: string): Page | null {
     lesson[2] !== undefined &&
     isLanguageCode(lesson[1])
   ) {
-    return { page: 'lesson', language: lesson[1], lesson: lesson[2] }
+    return {
+      page: lesson[3] === undefined ? 'lesson' : 'practice',
+      language: lesson[1],
+      lesson: lesson[2],
+    }
   }
 
   return null
@@ -72,6 +77,8 @@ export function pageHref(page: Page): string {
       return `#/taal/${page.language}`
     case 'lesson':
       return `#/taal/${page.language}/les/${page.lesson}`
+    case 'practice':
+      return `#/taal/${page.language}/les/${page.lesson}/oefenen`
     default:
       return hrefFor(page.page)
   }
@@ -79,7 +86,12 @@ export function pageHref(page: Page): string {
 
 /** Bij welk onderdeel van het hoofdmenu een pagina hoort. Cursussen horen bij het overzicht. */
 export function sectionOf(page: Page): RouteId {
-  return page.page === 'course' || page.page === 'lesson'
-    ? 'overview'
-    : page.page
+  switch (page.page) {
+    case 'course':
+    case 'lesson':
+    case 'practice':
+      return 'overview'
+    default:
+      return page.page
+  }
 }

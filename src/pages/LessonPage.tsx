@@ -8,6 +8,7 @@ import {
   ContentUnavailable,
   GroupedRow,
   GroupedSection,
+  PRIMARY_BUTTON,
   StatusBadge,
 } from '../app/ui'
 import { usePageTitle } from '../app/usePageTitle'
@@ -262,23 +263,32 @@ function Words({
   )
 }
 
-/** Oefeningen bestaan al in het pakket, maar de app kan ze nog niet afnemen. */
-function Practice({ exerciseCount }: { exerciseCount: number }) {
+/** De oefeningen bij de les, met een knop om te beginnen. */
+function Practice({
+  href,
+  exerciseCount,
+}: {
+  href: string
+  exerciseCount: number
+}) {
   return (
     <section
       aria-labelledby="oefenen-titel"
-      className="flex gap-4 rounded-card bg-surface p-5"
+      className="flex flex-wrap items-center gap-4 rounded-card bg-surface p-5"
     >
-      <SymbolIcon name="book" className="size-7 shrink-0 text-secondary" />
-      <div>
+      <SymbolIcon name="book" className="size-7 shrink-0 text-tint" />
+      <div className="min-w-0 flex-1">
         <h2 id="oefenen-titel" className="font-semibold">
           Oefenen
         </h2>
-        <p className="mt-1 text-subhead text-secondary">
-          Bij deze les horen {count(exerciseCount, 'oefening', 'oefeningen')}.
-          Oefenen kan nog niet; dat komt in een volgende versie van de app.
+        <p className="mt-0.5 text-subhead text-secondary">
+          {count(exerciseCount, 'oefening', 'oefeningen')}, met uitleg bij elk
+          antwoord.
         </p>
       </div>
+      <a href={href} className={PRIMARY_BUTTON}>
+        Beginnen
+      </a>
     </section>
   )
 }
@@ -372,7 +382,14 @@ function Lesson({
         )}
         {words.length > 0 && <Words language={language} words={words} />}
         {lesson.exercises.length > 0 && (
-          <Practice exerciseCount={lesson.exercises.length} />
+          <Practice
+            href={pageHref({
+              page: 'practice',
+              language: language.code,
+              lesson: lesson.id,
+            })}
+            exerciseCount={lesson.exercises.length}
+          />
         )}
         <StatusNote status={lesson.status} />
         {(previous !== undefined || next !== undefined) && (

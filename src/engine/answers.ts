@@ -118,7 +118,7 @@ interface Fold {
   errorType: 'diacritics' | 'script'
   /** Maakt twee vormen gelijk die alleen hierin verschillen. */
   fold: (text: string) => string
-  /** Uitleg, als vervolg op "Bijna: ". */
+  /** Uitleg, met een kleine letter; het oordeel zelf staat er al boven. */
   message: string
 }
 
@@ -395,13 +395,17 @@ export function checkTypedAnswer(
       ? {
           verdict: 'correct',
           errorType,
-          feedback: explain('Goed gerekend. Precies is het:', expected, target),
+          feedback: explain('Precies geschreven:', expected, target),
           expected,
         }
       : {
           verdict: 'almost',
           errorType,
-          feedback: explain(`Bijna: ${message}. Goed is`, expected, target),
+          feedback: explain(
+            `${message.charAt(0).toUpperCase()}${message.slice(1)}. Goed is`,
+            expected,
+            target,
+          ),
           expected,
         }
 

@@ -57,6 +57,17 @@ describe('hrefFor en pageHref', () => {
     expect(pageHref({ page: 'course', language: 'fa' })).toBe('#/taal/fa')
     expect(pageHref({ page: 'settings' })).toBe('#/instellingen')
   })
+
+  it('maakt de link naar het oefenen bij een les', () => {
+    const practice = {
+      page: 'practice',
+      language: 'es',
+      lesson: 'a1-begroeten-hallo',
+    } as const
+    expect(pageHref(practice)).toBe('#/taal/es/les/a1-begroeten-hallo/oefenen')
+    expect(pageFromHash(pageHref(practice))).toEqual(practice)
+    expect(sectionOf(practice)).toBe('overview')
+  })
 })
 
 describe('sectionOf', () => {

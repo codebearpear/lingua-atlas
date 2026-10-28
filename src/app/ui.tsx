@@ -7,6 +7,14 @@ import {
 import { SymbolIcon, type SymbolName } from './Icons'
 import { followBackLink } from './navigation'
 
+/** Een knop of link voor de belangrijkste actie: wit op blauw. */
+export const PRIMARY_BUTTON =
+  'inline-flex min-h-11 items-center justify-center rounded-full bg-tint-fill px-5 text-subhead font-semibold text-on-tint transition-opacity active:opacity-80 disabled:cursor-not-allowed disabled:opacity-40'
+
+/** Een knop of link voor een andere actie: blauwe tekst. */
+export const SECONDARY_BUTTON =
+  'inline-flex min-h-11 items-center justify-center rounded-full px-4 text-subhead font-semibold text-tint transition-colors hover:bg-muted'
+
 /** De terugknop boven een pagina, zoals linksboven in een app op de iPad. */
 export function BackLink({ href, label }: { href: string; label: string }) {
   return (

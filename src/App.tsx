@@ -7,6 +7,7 @@ import { CoursePage } from './pages/CoursePage'
 import { LessonPage } from './pages/LessonPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { OverviewPage } from './pages/OverviewPage'
+import { PracticePage } from './pages/PracticePage'
 import { ScriptTestPage } from './pages/ScriptTestPage'
 import { SettingsPage } from './pages/SettingsPage'
 
@@ -26,6 +27,14 @@ function pageContent(page: Page | null): ReactNode {
     case 'lesson':
       return (
         <LessonPage
+          key={`${page.language}/${page.lesson}`}
+          language={page.language}
+          lesson={page.lesson}
+        />
+      )
+    case 'practice':
+      return (
+        <PracticePage
           key={`${page.language}/${page.lesson}`}
           language={page.language}
           lesson={page.lesson}

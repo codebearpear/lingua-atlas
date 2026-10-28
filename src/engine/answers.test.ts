@@ -50,7 +50,7 @@ describe('Spaans', () => {
     const result = typed('adios', goodbye, 'es')
     expect(verdict(result)).toBe('almost diacritics')
     expect(result.feedback).toEqual([
-      'Bijna: let op de accenten. Goed is ',
+      'Let op de accenten. Goed is ',
       { kind: 'target', text: 'adi\u00f3s' },
       '.',
     ])
@@ -117,9 +117,7 @@ describe('Nederlands, bij herkennen', () => {
     expect(verdict(typed('Aangenaam!', pleased, 'nl'))).toBe('correct')
     const result = typed('aangenam', pleased, 'nl')
     expect(verdict(result)).toBe('correct spelling')
-    expect(result.feedback).toEqual([
-      'Goed gerekend. Precies is het: aangenaam.',
-    ])
+    expect(result.feedback).toEqual(['Precies geschreven: aangenaam.'])
   })
 
   it('laat een lidwoord voor het antwoord toe', () => {

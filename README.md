@@ -51,15 +51,19 @@ In de app staat onder Instellingen, bij Taalpakketten, per taal wat het pakket b
 
 ## Lessen
 
-Tik in het overzicht op een taal voor de cursus: de eenheden op volgorde, elk met haar lessen. Een les toont wat je leert, de uitleg met voorbeeldzinnen, cultuur, de woorden met hun vertaling en hoeveel oefeningen erbij horen. Oefenen kan nog niet; dat komt in fase 6.
+Tik in het overzicht op een taal voor de cursus: de eenheden op volgorde, elk met haar lessen. Een les toont wat je leert, de uitleg met voorbeeldzinnen, cultuur, de woorden met hun vertaling en de oefeningen die erbij horen.
 
 Elke les en eenheid toont haar status. Die van een les is de laagste van de les zelf en alles wat ze toont: woorden, voorbeeldzinnen en oefeningen. Die van een eenheid is de laagste van de eenheid en haar lessen.
 
 Bij het bouwen zet een Vite-plug-in (`scripts/packs.ts`) elk gecontroleerd pakket om in een lespakket voor de app (`src/packs/compile.ts`). De app laadt het lespakket van een taal pas als je die taal opent; de service worker bewaart het, zodat lessen ook zonder internet werken.
 
+## Oefenen
+
+Op de pagina van een les staat een knop om te oefenen. Je doet de oefeningen van de les na elkaar: meerkeuze en getypte antwoorden. Onder het invoerveld staan knoppen voor tekens die op een Nederlands toetsenbord lastig zijn, zoals á, ñ en ¿ voor het Spaans en ä en ß voor het Duits; voor een taal met een eigen schrift gebruik je het toetsenbord van die taal. Na elk antwoord zie je het oordeel met uitleg. Is je antwoord goed, maar staat het niet in de sleutel, dan tik je op Mijn antwoord klopt toch. Aan het eind zie je per oefening wat je antwoordde. Je antwoorden worden nog niet bewaard.
+
 ## Antwoordcontrole
 
-De app beoordeelt een antwoord als goed, bijna goed of fout (`src/engine/answers.ts`). Oefenen in de app zelf komt in een volgende versie.
+De app beoordeelt een antwoord als goed, bijna goed of fout (`src/engine/answers.ts`).
 
 - **Goed:** hoofdletters, leestekens en de soort aanhalingsteken tellen niet mee. Valt er iets op, zoals een ontbrekend ¿ in het Spaans of een spatie in het Koreaans, dan volgt een opmerking.
 - **Bijna goed:** je kende het antwoord, maar de vorm wijkt af: een ontbrekend accent (adios voor adiós), letters van een ander toetsenbord (de Arabische ك voor de Perzische ک) of een kleine tikfout. Korte woorden krijgen geen ruimte voor tikfouten, want die worden snel een ander woord; in het Koreaans telt de app per jamo. In het Duits tellen hoofdletters mee, behalve aan het begin van een zin.

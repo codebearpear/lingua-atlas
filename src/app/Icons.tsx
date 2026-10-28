@@ -88,6 +88,7 @@ export type SymbolName =
   | 'exclamation-circle'
   | 'globe'
   | 'question-circle'
+  | 'xmark-circle'
 
 const SYMBOLS: Record<SymbolName, ReactNode> = {
   // Een open boek
@@ -125,6 +126,12 @@ const SYMBOLS: Record<SymbolName, ReactNode> = {
       <circle cx="12" cy="12" r="9" />
       <ellipse cx="12" cy="12" rx="3.8" ry="9" />
       <path d="M3 12h18" />
+    </>
+  ),
+  'xmark-circle': (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="m9 9 6 6M15 9l-6 6" />
     </>
   ),
   'question-circle': (
