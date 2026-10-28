@@ -12,7 +12,7 @@
  *   antwoordsleutels), niet over de taal zelf.
  */
 import { z } from 'zod'
-import { normalizeAnswer } from '../engine/normalize.ts'
+import { answerKey } from '../engine/answers.ts'
 import { parseInline } from './inline.ts'
 import {
   manifestSchema,
@@ -778,7 +778,16 @@ export function checkPack(input: PackInput, options: CheckOptions): PackReport {
           `${exercisePath}.items`,
           exercise.id,
         )
-        checkAnswerKey(exercise, file, exercisePath, add)
+        checkAnswerKey(
+          exercise,
+          // Herkennen: antwoord in het Nederlands. Produceren: in de doeltaal.
+          exercise.direction === 'to-dutch'
+            ? 'nl'
+            : (manifest?.language.code ?? ''),
+          file,
+          exercisePath,
+          add,
+        )
       })
     })
   }
@@ -1021,9 +1030,14 @@ export function checkPack(input: PackInput, options: CheckOptions): PackReport {
   }
 }
 
-/** Elke oefening heeft een volledige en eenduidige antwoordsleutel. */
+/**
+ * Elke oefening heeft een volledige en eenduidige antwoordsleutel. Twee
+ * antwoorden die alleen in hoofdletters of leestekens verschillen, ziet de
+ * antwoordcontrole als hetzelfde (src/engine/answers.ts).
+ */
 function checkAnswerKey(
   exercise: Exercise,
+  language: string,
   file: string,
   path: string,
   add: (
@@ -1055,7 +1069,7 @@ function checkAnswerKey(
     }
     const seen = new Set<string>()
     exercise.choices.forEach((choice, index) => {
-      const key = normalizeAnswer(choice.text)
+      const key = answerKey(choice.text, language)
       if (seen.has(key)) {
         add(
           'error',
@@ -1072,7 +1086,7 @@ function checkAnswerKey(
 
   const accepted = new Set<string>()
   exercise.answers.forEach((answer, index) => {
-    const key = normalizeAnswer(answer)
+    const key = answerKey(answer, language)
     if (accepted.has(key)) {
       add(
         'warning',
@@ -1085,7 +1099,7 @@ function checkAnswerKey(
     accepted.add(key)
   })
   exercise.feedback?.forEach((entry, index) => {
-    if (accepted.has(normalizeAnswer(entry.answer))) {
+    if (accepted.has(answerKey(entry.answer, language))) {
       add(
         'error',
         file,

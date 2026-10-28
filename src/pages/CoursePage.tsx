@@ -18,8 +18,8 @@ import type { CompiledLesson, CompiledUnit } from '../packs/compiled'
 function lessonContents(lesson: CompiledLesson): string {
   return [
     lesson.words.length > 0 && count(lesson.words.length, 'woord', 'woorden'),
-    lesson.exerciseCount > 0 &&
-      count(lesson.exerciseCount, 'oefening', 'oefeningen'),
+    lesson.exercises.length > 0 &&
+      count(lesson.exercises.length, 'oefening', 'oefeningen'),
   ]
     .filter((part) => part !== false)
     .join(' · ')

@@ -13,7 +13,7 @@ function lesson(id: string): CompiledLesson {
     goals: [['Je kunt iets.']],
     blocks: [{ type: 'explanation', text: ['Uitleg.'], examples: [] }],
     words: [],
-    exerciseCount: 0,
+    exercises: [],
     status: 'auto-checked',
   }
 }

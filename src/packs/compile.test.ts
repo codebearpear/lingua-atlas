@@ -87,6 +87,25 @@ function packFiles(): Record<string, unknown> {
           // concept blijft dan Concept.
           blocks: [{ type: 'explanation', text: '*Adi\u00f3s* betekent dag.' }],
           words: ['adios'],
+          exercises: [
+            {
+              id: 'oef-adios',
+              type: 'typed-answer',
+              skill: 'vocabulary',
+              direction: 'to-target',
+              instruction: 'Vertaal naar het Spaans.',
+              prompt: 'dag',
+              items: ['adios'],
+              answers: ['adi\u00f3s'],
+              feedback: [
+                {
+                  answer: 'adios',
+                  errorType: 'diacritics',
+                  message: 'Bijna: *adi\u00f3s* heeft een accent.',
+                },
+              ],
+            },
+          ],
         },
       ],
       verification: VERIFIED,
@@ -162,7 +181,6 @@ describe('compilePack', () => {
       id: 'a1-begroeten-hallo',
       title: 'Hallo',
       words: ['hola'],
-      exerciseCount: 1,
     })
     expect(first?.lessons[0]?.blocks[1]).toEqual({
       type: 'culture',
@@ -175,6 +193,42 @@ describe('compilePack', () => {
         examples: [],
       },
     ])
+  })
+
+  it('neemt de oefeningen over, met hun status', () => {
+    const [first, second] = compile(packFiles()).units
+    expect(first?.lessons[0]?.exercises).toEqual([
+      {
+        id: 'oef-hola',
+        skill: 'vocabulary',
+        direction: 'to-dutch',
+        instruction: ['Wat betekent dit?'],
+        prompt: 'hola',
+        items: ['hola'],
+        status: 'source-verified',
+        type: 'multiple-choice',
+        choices: [
+          { text: 'hallo', correct: true, feedback: undefined },
+          { text: 'dag', correct: false, feedback: undefined },
+        ],
+      },
+    ])
+    expect(second?.lessons[0]?.exercises[0]).toMatchObject({
+      type: 'typed-answer',
+      answers: ['adi\u00f3s'],
+      feedback: [
+        {
+          answer: 'adios',
+          errorType: 'diacritics',
+          message: [
+            'Bijna: ',
+            { kind: 'target', text: 'adi\u00f3s' },
+            ' heeft een accent.',
+          ],
+        },
+      ],
+      status: 'auto-checked',
+    })
   })
 
   it('zet Nederlandse tekst om in stukken, met de doeltaal gemarkeerd', () => {

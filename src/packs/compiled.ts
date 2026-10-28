@@ -9,7 +9,7 @@
  * Dit bestand bevat alleen typen, zodat de app er niets extra's door laadt.
  */
 import type { InlineText } from './inline.ts'
-import type { Word } from './schema.ts'
+import type { ERROR_TYPES, SKILLS, Word } from './schema.ts'
 import type { EffectiveStatus } from './summary.ts'
 
 export type { InlinePart, InlineText } from './inline.ts'
@@ -17,6 +17,8 @@ export type { InlinePart, InlineText } from './inline.ts'
 export type PartOfSpeech = Word['partOfSpeech']
 export type Gender = NonNullable<Word['gender']>
 export type Register = NonNullable<Word['register']>[number]
+export type ErrorType = (typeof ERROR_TYPES)[number]
+export type Skill = (typeof SKILLS)[number]
 
 export interface CompiledWord {
   id: string
@@ -52,6 +54,38 @@ export type CompiledBlock =
     }
   | { type: 'culture'; text: InlineText }
 
+interface ExerciseFields {
+  id: string
+  skill: Skill
+  /** to-dutch is herkennen (antwoord in het Nederlands), to-target produceren. */
+  direction: 'to-dutch' | 'to-target'
+  instruction: InlineText
+  /** In de doeltaal bij herkennen, in het Nederlands bij produceren. */
+  prompt: string
+  /** Woorden of zinnen die de oefening toetst, als kenmerken. */
+  items: string[]
+  status: EffectiveStatus
+}
+
+export type CompiledExercise = ExerciseFields &
+  (
+    | {
+        type: 'multiple-choice'
+        choices: { text: string; correct: boolean; feedback?: InlineText }[]
+      }
+    | {
+        type: 'typed-answer'
+        /** Alle goede antwoorden. */
+        answers: string[]
+        /** Bekende foute antwoorden met gerichte uitleg. */
+        feedback: {
+          answer: string
+          errorType: ErrorType
+          message: InlineText
+        }[]
+      }
+  )
+
 export interface CompiledLesson {
   id: string
   title: string
@@ -59,7 +93,7 @@ export interface CompiledLesson {
   blocks: CompiledBlock[]
   /** Woorden die de les aanleert, als kenmerken uit words. */
   words: string[]
-  exerciseCount: number
+  exercises: CompiledExercise[]
   /**
    * De laagste status van de les en alles wat ze toont: woorden,
    * voorbeeldzinnen en oefeningen.

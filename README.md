@@ -57,6 +57,16 @@ Elke les en eenheid toont haar status. Die van een les is de laagste van de les 
 
 Bij het bouwen zet een Vite-plug-in (`scripts/packs.ts`) elk gecontroleerd pakket om in een lespakket voor de app (`src/packs/compile.ts`). De app laadt het lespakket van een taal pas als je die taal opent; de service worker bewaart het, zodat lessen ook zonder internet werken.
 
+## Antwoordcontrole
+
+De app beoordeelt een antwoord als goed, bijna goed of fout (`src/engine/answers.ts`). Oefenen in de app zelf komt in een volgende versie.
+
+- **Goed:** hoofdletters, leestekens en de soort aanhalingsteken tellen niet mee. Valt er iets op, zoals een ontbrekend ¿ in het Spaans of een spatie in het Koreaans, dan volgt een opmerking.
+- **Bijna goed:** je kende het antwoord, maar de vorm wijkt af: een ontbrekend accent (adios voor adiós), letters van een ander toetsenbord (de Arabische ك voor de Perzische ک) of een kleine tikfout. Korte woorden krijgen geen ruimte voor tikfouten, want die worden snel een ander woord; in het Koreaans telt de app per jamo. In het Duits tellen hoofdletters mee, behalve aan het begin van een zin.
+- **Fout:** iets anders dan gevraagd. Staan de goede woorden in de verkeerde volgorde, dan zegt de uitleg dat.
+
+Bekende foute antwoorden in het pakket krijgen hun eigen uitleg en fouttype. Antwoorden in het Nederlands, bij herkennen, beoordeelt de app milder: een tikfout of een lidwoord meer of minder telt als goed, want daar toets je of je de doeltaal begrijpt.
+
 ## Je gegevens
 
 Lingua Atlas bewaart alles op je eigen apparaat, in de database van de browser (IndexedDB, via Dexie; zie `src/data/database.ts`). Er gaat niets naar een server. Onder Instellingen zie je:

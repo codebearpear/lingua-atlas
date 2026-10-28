@@ -371,8 +371,8 @@ function Lesson({
           ),
         )}
         {words.length > 0 && <Words language={language} words={words} />}
-        {lesson.exerciseCount > 0 && (
-          <Practice exerciseCount={lesson.exerciseCount} />
+        {lesson.exercises.length > 0 && (
+          <Practice exerciseCount={lesson.exercises.length} />
         )}
         <StatusNote status={lesson.status} />
         {(previous !== undefined || next !== undefined) && (

@@ -302,11 +302,19 @@ export const SKILLS = [
   'speaking',
 ] as const
 
+/**
+ * Soorten fouten, voor gerichte uitleg bij bekende foute antwoorden. Hoe zwaar
+ * elke soort weegt, staat in src/engine/answers.ts.
+ */
 export const ERROR_TYPES = [
   'spelling',
   'diacritics',
   'gender',
   'conjugation',
+  'case',
+  'particle',
+  'ezafe',
+  'vowel-sign',
   'word-order',
   'word-choice',
   'register',

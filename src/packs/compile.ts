@@ -8,6 +8,7 @@
  */
 import type { PackReport } from './check.ts'
 import type {
+  CompiledExercise,
   CompiledLesson,
   CompiledPack,
   CompiledSentence,
@@ -15,7 +16,7 @@ import type {
   CompiledWord,
 } from './compiled.ts'
 import { parseInline, type InlineText } from './inline.ts'
-import type { Lesson } from './schema.ts'
+import type { Exercise, Lesson } from './schema.ts'
 import { lowestOf, type EffectiveStatus } from './summary.ts'
 
 /** Zonder bekende status rekent de app met Concept. */
@@ -43,6 +44,41 @@ function exampleIds(lesson: Lesson): string[] {
   ]
 }
 
+function compileExercise(
+  report: PackReport,
+  exercise: Exercise,
+): CompiledExercise {
+  const fields = {
+    id: exercise.id,
+    skill: exercise.skill,
+    direction: exercise.direction,
+    instruction: inline(exercise.instruction),
+    prompt: exercise.prompt,
+    items: exercise.items ?? [],
+    status: statusOf(report, exercise.id),
+  }
+  return exercise.type === 'multiple-choice'
+    ? {
+        ...fields,
+        type: 'multiple-choice',
+        choices: exercise.choices.map((choice) => ({
+          text: choice.text,
+          correct: choice.correct,
+          feedback: inlineOrNone(choice.feedback),
+        })),
+      }
+    : {
+        ...fields,
+        type: 'typed-answer',
+        answers: exercise.answers,
+        feedback: (exercise.feedback ?? []).map((entry) => ({
+          answer: entry.answer,
+          errorType: entry.errorType,
+          message: inline(entry.message),
+        })),
+      }
+}
+
 function compileLesson(report: PackReport, lesson: Lesson): CompiledLesson {
   const exercises = lesson.exercises ?? []
   const words = lesson.words ?? []
@@ -60,7 +96,7 @@ function compileLesson(report: PackReport, lesson: Lesson): CompiledLesson {
         : { type: 'culture', text: inline(block.text) },
     ),
     words,
-    exerciseCount: exercises.length,
+    exercises: exercises.map((exercise) => compileExercise(report, exercise)),
     status: lowestOf([
       statusOf(report, lesson.id),
       ...words.map((id) => statusOf(report, id)),
