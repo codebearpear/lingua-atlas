@@ -1,5 +1,6 @@
+import { useEffect, useState } from 'react'
 import { CourseLoadError, CourseLoading } from '../app/CourseStates'
-import { count, joinList, regionName } from '../app/format'
+import { count, joinList, momentLabel, regionName } from '../app/format'
 import { SymbolIcon } from '../app/Icons'
 import { MarkedText } from '../app/MarkedText'
 import { pageHref } from '../app/routes'
@@ -12,6 +13,7 @@ import {
   StatusBadge,
 } from '../app/ui'
 import { usePageTitle } from '../app/usePageTitle'
+import { VERDICT_ORDER, VERDICTS } from '../app/verdicts'
 import {
   findLesson,
   sentencesOf,
@@ -24,6 +26,11 @@ import {
   type Language,
   type LanguageCode,
 } from '../content/languages'
+import { appDatabase } from '../data/appDatabase'
+import type { PracticeRound } from '../data/database'
+import { logError } from '../data/errorLog'
+import { lastFinishedRound, roundCounts } from '../data/rounds'
+import type { Verdict } from '../engine/answers'
 import type {
   CompiledLesson,
   CompiledPack,
@@ -263,32 +270,107 @@ function Words({
   )
 }
 
-/** De oefeningen bij de les, met een knop om te beginnen. */
+/**
+ * De laatste afgeronde oefenronde bij een les: undefined zolang die laadt,
+ * null als er nog geen is of als het lezen mislukt.
+ */
+function useLastRound(
+  language: LanguageCode,
+  lesson: string,
+): PracticeRound | null | undefined {
+  const [round, setRound] = useState<PracticeRound | null>()
+
+  useEffect(() => {
+    let active = true
+    lastFinishedRound(appDatabase(), language, lesson).then(
+      (found) => {
+        if (active) {
+          setRound(found ?? null)
+        }
+      },
+      (error: unknown) => {
+        void logError(error, 'Laatste oefenronde lezen')
+        if (active) {
+          setRound(null)
+        }
+      },
+    )
+    return () => {
+      active = false
+    }
+  }, [language, lesson])
+
+  return round
+}
+
+/** Hoe vaak elk oordeel voorkwam, met zijn pictogram. Wat niet voorkwam, blijft weg. */
+function VerdictCounts({ counts }: { counts: Record<Verdict, number> }) {
+  const shown = VERDICT_ORDER.filter((verdict) => counts[verdict] > 0)
+  return (
+    <span className="flex flex-wrap gap-x-4 gap-y-1">
+      {shown.map((verdict, index) => (
+        <span
+          key={verdict}
+          className="inline-flex items-center gap-1.5 whitespace-nowrap"
+        >
+          <SymbolIcon
+            name={VERDICTS[verdict].icon}
+            className={`size-[1.125rem] shrink-0 ${VERDICTS[verdict].tone}`}
+          />
+          {counts[verdict]} {VERDICTS[verdict].label.toLowerCase()}
+          {/* Zodat een schermlezer de aantallen niet aan elkaar plakt. */}
+          {index < shown.length - 1 && <span className="sr-only">, </span>}
+        </span>
+      ))}
+    </span>
+  )
+}
+
+/** De oefeningen bij de les, met je laatste resultaat en een knop om te beginnen. */
 function Practice({
-  href,
-  exerciseCount,
+  language,
+  lesson,
 }: {
-  href: string
-  exerciseCount: number
+  language: LanguageCode
+  lesson: CompiledLesson
 }) {
+  const last = useLastRound(language, lesson.id)
+  const finishedAt = last?.finishedAt
+
   return (
     <section
       aria-labelledby="oefenen-titel"
-      className="flex flex-wrap items-center gap-4 rounded-card bg-surface p-5"
+      className="flex items-start gap-4 rounded-card bg-surface p-5"
     >
-      <SymbolIcon name="book" className="size-7 shrink-0 text-tint" />
-      <div className="min-w-0 flex-1">
-        <h2 id="oefenen-titel" className="font-semibold">
-          Oefenen
-        </h2>
-        <p className="mt-0.5 text-subhead text-secondary">
-          {count(exerciseCount, 'oefening', 'oefeningen')}, met uitleg bij elk
-          antwoord.
-        </p>
+      <SymbolIcon name="book" className="-mt-[3px] size-7 shrink-0 text-tint" />
+      {/* De knop staat naast de tekst, of eronder als daar geen plek voor is. */}
+      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-6 gap-y-4">
+        <div className="min-w-0 flex-1 basis-56">
+          <h2 id="oefenen-titel" className="font-semibold">
+            Oefenen
+          </h2>
+          <p className="mt-0.5 text-subhead text-secondary">
+            {count(lesson.exercises.length, 'oefening', 'oefeningen')}, met
+            uitleg bij elk antwoord.
+          </p>
+          {last && finishedAt !== undefined && (
+            <div className="mt-3 text-subhead">
+              <p className="text-secondary">
+                Laatste ronde {momentLabel(finishedAt)}
+              </p>
+              <p className="mt-1">
+                <VerdictCounts counts={roundCounts(last)} />
+              </p>
+            </div>
+          )}
+        </div>
+        <a
+          href={pageHref({ page: 'practice', language, lesson: lesson.id })}
+          className={PRIMARY_BUTTON}
+        >
+          {last ? 'Opnieuw oefenen' : 'Beginnen'}
+        </a>
       </div>
-      <a href={href} className={PRIMARY_BUTTON}>
-        Beginnen
-      </a>
     </section>
   )
 }
@@ -382,14 +464,7 @@ function Lesson({
         )}
         {words.length > 0 && <Words language={language} words={words} />}
         {lesson.exercises.length > 0 && (
-          <Practice
-            href={pageHref({
-              page: 'practice',
-              language: language.code,
-              lesson: lesson.id,
-            })}
-            exerciseCount={lesson.exercises.length}
-          />
+          <Practice language={language.code} lesson={lesson} />
         )}
         <StatusNote status={lesson.status} />
         {(previous !== undefined || next !== undefined) && (

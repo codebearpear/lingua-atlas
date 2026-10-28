@@ -8,7 +8,7 @@ import {
   type SubmitEvent,
 } from 'react'
 import { CourseLoadError, CourseLoading } from '../app/CourseStates'
-import { SymbolIcon, type SymbolName } from '../app/Icons'
+import { SymbolIcon } from '../app/Icons'
 import { MarkedText } from '../app/MarkedText'
 import { pageHref } from '../app/routes'
 import {
@@ -21,6 +21,7 @@ import {
   StatusBadge,
 } from '../app/ui'
 import { usePageTitle } from '../app/usePageTitle'
+import { countsText, VERDICTS } from '../app/verdicts'
 import { findLesson, type LessonPlace } from '../content/course'
 import { useCoursePack } from '../content/coursePacks'
 import { KEYBOARDS, SPECIAL_CHARACTERS } from '../content/keyboards'
@@ -29,11 +30,14 @@ import {
   type Language,
   type LanguageCode,
 } from '../content/languages'
+import { packSummary } from '../content/packs'
+import { appDatabase } from '../data/appDatabase'
+import { logError } from '../data/errorLog'
+import { roundRecord, saveRound } from '../data/rounds'
 import {
   checkChoice,
   checkTypedAnswer,
   type AnswerCheck,
-  type Verdict,
 } from '../engine/answers'
 import {
   finalVerdict,
@@ -44,44 +48,14 @@ import {
   type PracticeAction,
   type PracticeState,
 } from '../engine/practice'
-import type { CompiledExercise, InlineText } from '../packs/compiled'
+import type {
+  CompiledExercise,
+  CompiledLesson,
+  InlineText,
+} from '../packs/compiled'
 
 type ChoiceExercise = Extract<CompiledExercise, { type: 'multiple-choice' }>
 type TypedExercise = Extract<CompiledExercise, { type: 'typed-answer' }>
-
-/** Hoe een oordeel eruitziet: woord, pictogram en kleuren. */
-const VERDICTS: Record<
-  Verdict,
-  {
-    label: string
-    icon: SymbolName
-    tone: string
-    panel: string
-    border: string
-  }
-> = {
-  correct: {
-    label: 'Goed',
-    icon: 'checkmark-circle',
-    tone: 'text-positive',
-    panel: 'bg-positive/10',
-    border: 'border-positive',
-  },
-  almost: {
-    label: 'Bijna goed',
-    icon: 'exclamation-circle',
-    tone: 'text-caution',
-    panel: 'bg-caution/10',
-    border: 'border-caution',
-  },
-  wrong: {
-    label: 'Fout',
-    icon: 'xmark-circle',
-    tone: 'text-destructive',
-    panel: 'bg-destructive/10',
-    border: 'border-destructive',
-  },
-}
 
 /** Tekst in de doeltaal of in het Nederlands, met de juiste taal en richting. */
 function languageProps(
@@ -424,7 +398,7 @@ function Feedback({
           ref={next}
           type="button"
           onClick={() => {
-            dispatch({ type: 'next' })
+            dispatch({ type: 'next', at: Date.now() })
           }}
           className={PRIMARY_BUTTON}
         >
@@ -461,7 +435,7 @@ function ExerciseCard({
   const attempt = state.phase === 'feedback' ? state.attempts.at(-1) : undefined
   const headingId = useId()
   const onCheck = (given: string, check: AnswerCheck) => {
-    dispatch({ type: 'check', given, check })
+    dispatch({ type: 'check', given, check, at: Date.now() })
   }
 
   // Een nieuwe oefening in beeld, ook als je naar beneden had gescrold.
@@ -523,15 +497,17 @@ function Summary({
   exercises,
   language,
   place,
+  saveFailed,
   onRestart,
 }: {
   state: PracticeState
   exercises: readonly CompiledExercise[]
   language: Language
   place: LessonPlace
+  /** Of het bewaren van de ronde is mislukt. */
+  saveFailed: boolean
   onRestart: () => void
 }) {
-  const counts = tally(state.attempts)
   const lessonHref = pageHref({
     page: 'lesson',
     language: language.code,
@@ -547,15 +523,41 @@ function Summary({
         />
         <h2 className="mt-3 text-title2 font-bold">Klaar met oefenen</h2>
         <p className="mt-1 text-secondary">
-          {counts.correct} goed · {counts.almost} bijna goed · {counts.wrong}{' '}
-          fout
+          {countsText(tally(state.attempts))}
         </p>
       </section>
+
+      {saveFailed && (
+        <p
+          role="alert"
+          className="flex gap-3 rounded-card bg-caution/10 p-4 text-subhead"
+        >
+          <SymbolIcon
+            name="exclamation-circle"
+            className="size-6 shrink-0 text-caution"
+          />
+          <span>
+            Je antwoorden zijn niet bewaard: opslaan op dit apparaat lukte niet.
+            De melding staat in het foutenlogboek onder{' '}
+            <a
+              href={pageHref({ page: 'settings' })}
+              className="font-semibold text-tint hover:underline"
+            >
+              Instellingen
+            </a>
+            .
+          </span>
+        </p>
+      )}
 
       <GroupedSection
         id="antwoorden"
         title="Jouw antwoorden"
-        footer="Je antwoorden worden nog niet bewaard en tellen nog niet mee voor herhalen; dat komt in een volgende versie."
+        footer={
+          saveFailed
+            ? 'Je antwoorden tellen nog niet mee voor herhalen; dat komt in een volgende versie.'
+            : 'Je antwoorden worden op dit apparaat bewaard en gaan mee in je back-up. Ze tellen nog niet mee voor herhalen; dat komt in een volgende versie.'
+        }
       >
         {state.attempts.map((attempt) => {
           const exercise = exercises.find(
@@ -629,6 +631,54 @@ function Summary({
   )
 }
 
+/**
+ * Bewaart de ronde zodra er iets verandert: na elk antwoord, na zelf
+ * goedkeuren en aan het eind. Geeft terug of het laatste bewaren mislukte.
+ */
+function useSavedRound(
+  state: PracticeState,
+  code: LanguageCode,
+  lesson: CompiledLesson,
+): boolean {
+  const [failed, setFailed] = useState(false)
+  const { id, startedAt, attempts, finishedAt } = state
+
+  useEffect(() => {
+    const round = roundRecord(
+      { id, startedAt, attempts, finishedAt },
+      {
+        language: code,
+        lesson: lesson.id,
+        packVersion: packSummary(code).version,
+        exercises: lesson.exercises,
+      },
+      Date.now(),
+    )
+    if (round === undefined) {
+      return
+    }
+    let active = true
+    saveRound(appDatabase(), round).then(
+      () => {
+        if (active) {
+          setFailed(false)
+        }
+      },
+      (error: unknown) => {
+        void logError(error, 'Oefenronde bewaren')
+        if (active) {
+          setFailed(true)
+        }
+      },
+    )
+    return () => {
+      active = false
+    }
+  }, [id, startedAt, attempts, finishedAt, code, lesson])
+
+  return failed
+}
+
 function PracticeSession({
   language,
   place,
@@ -642,6 +692,7 @@ function PracticeSession({
     lesson.exercises,
     (exercises) => startPractice(exercises),
   )
+  const saveFailed = useSavedRound(state, language.code, lesson)
   const exercise = lesson.exercises.find(
     (item) => item.id === state.order[state.index],
   )
@@ -675,6 +726,7 @@ function PracticeSession({
           exercises={lesson.exercises}
           language={language}
           place={place}
+          saveFailed={saveFailed}
           onRestart={() => {
             dispatch({
               type: 'restart',

@@ -27,6 +27,29 @@ function input(overrides: Partial<BackupInput> = {}): BackupInput {
 
 const READ = { databaseVersion: 1 }
 
+/** Een oefenronde zoals de database hem bewaart (database versie 2). */
+const ROUND = {
+  id: '6f1c2a0e-3b5d-4e8f-9a7b-1c2d3e4f5a6b',
+  language: 'es',
+  lesson: 'a1-begroeten-hallo',
+  packVersion: '0.3.1',
+  startedAt: 1000,
+  finishedAt: 3100,
+  updatedAt: 3100,
+  answers: [
+    {
+      exerciseId: 'oef-keuze',
+      type: 'multiple-choice',
+      direction: 'to-dutch',
+      items: ['hola'],
+      given: 'hallo',
+      verdict: 'correct',
+      overridden: false,
+      answeredAt: 2000,
+    },
+  ],
+}
+
 describe('canonicalJson', () => {
   it('zet de sleutels op volgorde, ook dieper in het bestand', () => {
     expect(canonicalJson({ b: 1, a: { d: [3, { f: 1, e: 2 }], c: 2 } })).toBe(
@@ -135,6 +158,36 @@ describe('readBackup', () => {
       await readBackup(serializeBackup(newerDatabase), READ),
     ).toMatchObject({ ok: false, problem: 'version' })
   })
+
+  it('leest oefenrondes, ook met velden die deze versie nog niet kent', async () => {
+    const backup = await createBackup(
+      input({
+        databaseVersion: 2,
+        tables: { rounds: [ROUND, { ...ROUND, id: 'b', later: 'nieuw' }] },
+      }),
+    )
+    expect(
+      await readBackup(serializeBackup(backup), { databaseVersion: 2 }),
+    ).toEqual({ ok: true, backup })
+  })
+
+  it('weigert oefenrondes die niet kloppen', async () => {
+    const wrong = [
+      { ...ROUND, id: '' },
+      { ...ROUND, language: 'nl' },
+      { ...ROUND, updatedAt: '3100' },
+      { ...ROUND, answers: [{ ...ROUND.answers[0], verdict: 'perfect' }] },
+      { ...ROUND, answers: [{ ...ROUND.answers[0], items: 'hola' }] },
+    ]
+    for (const round of wrong) {
+      const backup = await createBackup(
+        input({ databaseVersion: 2, tables: { rounds: [ROUND, round] } }),
+      )
+      expect(
+        await readBackup(serializeBackup(backup), { databaseVersion: 2 }),
+      ).toMatchObject({ ok: false, problem: 'records' })
+    }
+  })
 })
 
 describe('describeBackup', () => {
@@ -159,6 +212,25 @@ describe('describeBackup', () => {
     expect(describeBackup(backup, 'Europe/Amsterdam')).toMatchObject({
       contents: ['kaarten: 2'],
       hasRecords: true,
+    })
+  })
+
+  it('noemt de oefenrondes bij hun naam', async () => {
+    const backup = await createBackup(
+      input({ databaseVersion: 2, tables: { rounds: [ROUND] } }),
+    )
+    expect(describeBackup(backup, 'Europe/Amsterdam')).toMatchObject({
+      contents: ['instellingen (thema donker)', '1 oefenronde'],
+      hasRecords: true,
+    })
+  })
+
+  it('struikelt niet over een tabel met een vreemde naam', async () => {
+    const backup = await createBackup(
+      input({ settings: {}, tables: { constructor: [{ id: 'a' }] } }),
+    )
+    expect(describeBackup(backup, 'Europe/Amsterdam')).toMatchObject({
+      contents: ['constructor: 1'],
     })
   })
 })

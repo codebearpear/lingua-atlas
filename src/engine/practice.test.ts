@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { CompiledExercise } from '../packs/compiled'
 import type { AnswerCheck } from './answers'
 import {
+  countVerdicts,
   finalVerdict,
   practiceReducer,
   shuffled,
@@ -64,11 +65,22 @@ describe('shuffled', () => {
 
 describe('startPractice', () => {
   it('houdt de oefeningen in de volgorde van de les en schudt de keuzes', () => {
-    const state = startPractice([choice, typed], sequence(0, 0))
+    const state = startPractice([choice, typed], {
+      random: sequence(0, 0),
+      now: 1000,
+      id: 'ronde-1',
+    })
+    expect(state.id).toBe('ronde-1')
+    expect(state.startedAt).toBe(1000)
     expect(state.order).toEqual(['oef-keuze', 'oef-typen'])
     expect(state.choiceOrder['oef-keuze']).toEqual([1, 2, 0])
     expect(state.choiceOrder['oef-typen']).toBeUndefined()
     expect(state.phase).toBe('answer')
+    expect(state.finishedAt).toBeUndefined()
+  })
+
+  it('geeft elke ronde een eigen kenmerk', () => {
+    expect(startPractice([choice]).id).not.toBe(startPractice([choice]).id)
   })
 
   it('gaat zonder oefeningen meteen naar de samenvatting', () => {
@@ -77,7 +89,12 @@ describe('startPractice', () => {
 })
 
 describe('practiceReducer', () => {
-  const start = (): PracticeState => startPractice([choice, typed], sequence(0))
+  const start = (): PracticeState =>
+    startPractice([choice, typed], {
+      random: sequence(0),
+      now: 1000,
+      id: 'ronde-1',
+    })
 
   it('loopt van antwoorden via het oordeel naar de volgende oefening en de samenvatting', () => {
     let state = start()
@@ -85,6 +102,7 @@ describe('practiceReducer', () => {
       type: 'check',
       given: 'hallo',
       check: correct,
+      at: 2000,
     })
     expect(state.phase).toBe('feedback')
     expect(state.attempts).toEqual([
@@ -93,18 +111,22 @@ describe('practiceReducer', () => {
         given: 'hallo',
         check: correct,
         overridden: false,
+        answeredAt: 2000,
       },
     ])
-    state = practiceReducer(state, { type: 'next' })
+    state = practiceReducer(state, { type: 'next', at: 2500 })
     expect(state.phase).toBe('answer')
     expect(state.index).toBe(1)
+    expect(state.finishedAt).toBeUndefined()
     state = practiceReducer(state, {
       type: 'check',
       given: 'adios',
       check: almost,
+      at: 3000,
     })
-    state = practiceReducer(state, { type: 'next' })
+    state = practiceReducer(state, { type: 'next', at: 3500 })
     expect(state.phase).toBe('summary')
+    expect(state.finishedAt).toBe(3500)
     expect(tally(state.attempts)).toEqual({ correct: 1, almost: 1, wrong: 0 })
   })
 
@@ -114,30 +136,63 @@ describe('practiceReducer', () => {
       type: 'check',
       given: 'hallo',
       check: correct,
+      at: 2000,
     })
     expect(practiceReducer(state, { type: 'override' })).toBe(state)
-    state = practiceReducer(state, { type: 'next' })
+    state = practiceReducer(state, { type: 'next', at: 2500 })
     state = practiceReducer(state, {
       type: 'check',
       given: 'adios',
       check: almost,
+      at: 3000,
     })
     state = practiceReducer(state, { type: 'override' })
     const last = state.attempts.at(-1)
     expect(last?.overridden).toBe(true)
+    // Het tijdstip blijft dat van het controleren.
+    expect(last?.answeredAt).toBe(3000)
     expect(last === undefined ? undefined : finalVerdict(last)).toBe('correct')
   })
 
   it('negeert acties die niet bij de fase passen', () => {
     const state = start()
-    expect(practiceReducer(state, { type: 'next' })).toBe(state)
+    expect(practiceReducer(state, { type: 'next', at: 2000 })).toBe(state)
     const checked = practiceReducer(state, {
       type: 'check',
       given: 'hallo',
       check: correct,
+      at: 2000,
     })
     expect(
-      practiceReducer(checked, { type: 'check', given: 'dag', check: correct }),
+      practiceReducer(checked, {
+        type: 'check',
+        given: 'dag',
+        check: correct,
+        at: 2100,
+      }),
     ).toBe(checked)
+  })
+
+  it('houdt de lijst met antwoorden dezelfde als er alleen een volgende oefening komt', () => {
+    // De oefenpagina bewaart de ronde alleen als de antwoorden veranderen.
+    let state = start()
+    state = practiceReducer(state, {
+      type: 'check',
+      given: 'hallo',
+      check: correct,
+      at: 2000,
+    })
+    const next = practiceReducer(state, { type: 'next', at: 2500 })
+    expect(next.attempts).toBe(state.attempts)
+  })
+})
+
+describe('countVerdicts', () => {
+  it('telt elk oordeel, ook als het niet voorkomt', () => {
+    expect(countVerdicts(['wrong', 'correct', 'wrong'])).toEqual({
+      correct: 1,
+      almost: 0,
+      wrong: 2,
+    })
   })
 })

@@ -124,7 +124,7 @@ export function SettingsPage() {
         <GroupedSection
           id="over"
           title="Over Lingua Atlas"
-          footer="Wat je instelt, blijft op dit apparaat. Er gaat niets naar een server."
+          footer="Wat je instelt en oefent, blijft op dit apparaat. Er gaat niets naar een server."
         >
           <GroupedRow>
             <div className="flex justify-between gap-4">

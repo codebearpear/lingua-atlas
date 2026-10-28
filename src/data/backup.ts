@@ -7,6 +7,7 @@
  * is. Het controleren van een bestand staat apart in readBackup.ts, zodat de
  * app die code pas laadt als je een back-up terugzet.
  */
+import { count } from '../app/format'
 import { THEME_LABELS, type ThemePreference } from '../app/theme'
 
 export const BACKUP_FORMAT = 'lingua-atlas-backup'
@@ -121,6 +122,12 @@ export interface BackupDescription {
   hasRecords: boolean
 }
 
+/** Hoe een tabel heet als je de records telt: enkelvoud en meervoud. */
+const TABLE_NAMES: ReadonlyMap<string, readonly [string, string]> = new Map<
+  string,
+  readonly [string, string]
+>([['rounds', ['oefenronde', 'oefenrondes']]])
+
 /** Wat er in een back-up staat, om te tonen voordat je hem terugzet. */
 export function describeBackup(
   backup: Backup,
@@ -138,8 +145,13 @@ export function describeBackup(
     )
   }
   for (const [name, records] of Object.entries(backup.tables)) {
+    const names = TABLE_NAMES.get(name)
     if (records.length > 0) {
-      contents.push(`${name}: ${records.length}`)
+      contents.push(
+        names === undefined
+          ? `${name}: ${records.length}`
+          : count(records.length, ...names),
+      )
     }
   }
   return {

@@ -6,11 +6,12 @@ import { createBackup, type Backup, type BackupSettings } from './backup'
 import type { Database } from './database'
 
 /**
- * De tabellen die in een back-up gaan. Het foutenlogboek en de gegevens over
- * de database horen bij het apparaat en gaan niet mee. Komt er een tabel met
- * jouw gegevens bij, zoals herhaalkaarten, dan komt hij ook hier.
+ * De tabellen die in een back-up gaan: je oefenrondes. Het foutenlogboek en de
+ * gegevens over de database horen bij het apparaat en gaan niet mee. Komt er
+ * een tabel met jouw gegevens bij, zoals herhaalkaarten, dan komt hij ook
+ * hier, en in readBackup.ts een controle van de records.
  */
-export const BACKUP_TABLES: readonly string[] = []
+export const BACKUP_TABLES: readonly string[] = ['rounds']
 
 export async function collectBackup(
   db: Database,

@@ -9,7 +9,8 @@
  * Dit bestand bevat alleen typen, zodat de app er niets extra's door laadt.
  */
 import type { InlineText } from './inline.ts'
-import type { ERROR_TYPES, SKILLS, Word } from './schema.ts'
+import type { ERROR_TYPES, SKILLS } from './kinds.ts'
+import type { Word } from './schema.ts'
 import type { EffectiveStatus } from './summary.ts'
 
 export type { InlinePart, InlineText } from './inline.ts'

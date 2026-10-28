@@ -20,6 +20,7 @@
  * in de fasen die ze nodig hebben, met een hogere schemaversie.
  */
 import { z } from 'zod'
+import { ERROR_TYPES, SKILLS } from './kinds.ts'
 
 export const SCHEMA_VERSION = 1
 
@@ -292,36 +293,8 @@ export const sentencesFileSchema = z.strictObject({
 
 // ---------------------------------------------------------------------------
 // Eenheden, lessen en oefeningen (units/<kenmerk>.json)
-
-export const SKILLS = [
-  'vocabulary',
-  'grammar',
-  'reading',
-  'listening',
-  'writing',
-  'speaking',
-] as const
-
-/**
- * Soorten fouten, voor gerichte uitleg bij bekende foute antwoorden. Hoe zwaar
- * elke soort weegt, staat in src/engine/answers.ts.
- */
-export const ERROR_TYPES = [
-  'spelling',
-  'diacritics',
-  'gender',
-  'conjugation',
-  'case',
-  'particle',
-  'ezafe',
-  'vowel-sign',
-  'word-order',
-  'word-choice',
-  'register',
-  'script',
-  'spacing',
-  'punctuation',
-] as const
+//
+// De vaardigheden (SKILLS) en soorten fouten (ERROR_TYPES) staan in kinds.ts.
 
 const exerciseFields = {
   id: idSchema,

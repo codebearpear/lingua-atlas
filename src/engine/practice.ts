@@ -3,7 +3,9 @@
  * antwoord en het oordeel van de antwoordcontrole (answers.ts).
  *
  * Dit is alleen de toestand en hoe die verandert; het scherm staat in
- * src/pages/PracticePage.tsx. Zo is de ronde te testen zonder browser.
+ * src/pages/PracticePage.tsx en het bewaren in src/data/rounds.ts. Zo is de
+ * ronde te testen zonder browser. Tijden komen mee in de acties, zodat
+ * dezelfde acties altijd dezelfde ronde geven.
  */
 import type { CompiledExercise } from '../packs/compiled.ts'
 import type { AnswerCheck, Verdict } from './answers.ts'
@@ -15,9 +17,15 @@ export interface Attempt {
   check: AnswerCheck
   /** Zelf goedgekeurd: je antwoord klopte toch, maar stond niet in de sleutel. */
   overridden: boolean
+  /** Wanneer je het antwoord controleerde, in milliseconden sinds 1970. */
+  answeredAt: number
 }
 
 export interface PracticeState {
+  /** Het kenmerk waaronder de ronde bewaard wordt. */
+  id: string
+  /** Wanneer de ronde begon, in milliseconden sinds 1970. */
+  startedAt: number
   /** Kenmerken van de oefeningen, in de volgorde van deze ronde. */
   order: readonly string[]
   /** Per meerkeuzevraag de volgorde waarin de keuzes staan (indexen). */
@@ -28,13 +36,24 @@ export interface PracticeState {
   attempts: readonly Attempt[]
   /** Antwoorden, het oordeel bekijken, of de samenvatting aan het eind. */
   phase: 'answer' | 'feedback' | 'summary'
+  /** Wanneer je de laatste oefening afrondde. */
+  finishedAt?: number
 }
 
 export type PracticeAction =
-  | { type: 'check'; given: string; check: AnswerCheck }
+  | { type: 'check'; given: string; check: AnswerCheck; at: number }
   | { type: 'override' }
-  | { type: 'next' }
+  | { type: 'next'; at: number }
   | { type: 'restart'; state: PracticeState }
+
+export interface PracticeOptions {
+  /** Voor het schudden; tests geven een vaste reeks. */
+  random?: () => number
+  /** Het begin van de ronde. */
+  now?: number
+  /** Het kenmerk van de ronde. */
+  id?: string
+}
 
 /** Een nieuwe volgorde, eerlijk geschud (Fisher-Yates). */
 export function shuffled<T>(
@@ -61,7 +80,11 @@ export function shuffled<T>(
  */
 export function startPractice(
   exercises: readonly CompiledExercise[],
-  random: () => number = Math.random,
+  {
+    random = Math.random,
+    now = Date.now(),
+    id = crypto.randomUUID(),
+  }: PracticeOptions = {},
 ): PracticeState {
   const choiceOrder: Record<string, readonly number[]> = {}
   for (const exercise of exercises) {
@@ -73,6 +96,8 @@ export function startPractice(
     }
   }
   return {
+    id,
+    startedAt: now,
     order: exercises.map((exercise) => exercise.id),
     choiceOrder,
     index: 0,
@@ -100,6 +125,7 @@ export function practiceReducer(
             given: action.given,
             check: action.check,
             overridden: false,
+            answeredAt: action.at,
           },
         ],
         phase: 'feedback',
@@ -129,7 +155,7 @@ export function practiceReducer(
       const index = state.index + 1
       return index < state.order.length
         ? { ...state, index, phase: 'answer' }
-        : { ...state, phase: 'summary' }
+        : { ...state, phase: 'summary', finishedAt: action.at }
     }
     case 'restart':
       return action.state
@@ -141,11 +167,18 @@ export function finalVerdict(attempt: Attempt): Verdict {
   return attempt.overridden ? 'correct' : attempt.check.verdict
 }
 
-/** Hoeveel antwoorden goed, bijna goed en fout waren. */
-export function tally(attempts: readonly Attempt[]): Record<Verdict, number> {
+/** Hoe vaak elk oordeel voorkomt. */
+export function countVerdicts(
+  verdicts: Iterable<Verdict>,
+): Record<Verdict, number> {
   const counts: Record<Verdict, number> = { correct: 0, almost: 0, wrong: 0 }
-  for (const attempt of attempts) {
-    counts[finalVerdict(attempt)] += 1
+  for (const verdict of verdicts) {
+    counts[verdict] += 1
   }
   return counts
+}
+
+/** Hoeveel antwoorden goed, bijna goed en fout waren. */
+export function tally(attempts: readonly Attempt[]): Record<Verdict, number> {
+  return countVerdicts(attempts.map(finalVerdict))
 }

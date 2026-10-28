@@ -188,7 +188,11 @@ export function BackupSection() {
   const restore = async (backup: Backup, mode: RestoreMode) => {
     setBusy(true)
     try {
-      await restoreTables(appDatabase(), backup.tables, mode, BACKUP_TABLES)
+      // Zonder records zet de app alleen de instellingen terug; je gegevens op
+      // dit apparaat blijven dan staan.
+      if (describeBackup(backup).hasRecords) {
+        await restoreTables(appDatabase(), backup.tables, mode, BACKUP_TABLES)
+      }
       // Bij samenvoegen blijven de instellingen van dit apparaat.
       if (mode === 'replace') {
         setThemePreference(backup.settings.theme ?? 'system')
@@ -209,7 +213,7 @@ export function BackupSection() {
     <GroupedSection
       id="back-up"
       title="Back-up"
-      footer="Een back-up is één bestand met je gegevens van dit apparaat. Bewaar het buiten de app, bijvoorbeeld in iCloud Drive of OneDrive; op de iPad kun je Delen kiezen en dan Bewaar in Bestanden. Bij terugzetten controleert de app het bestand en laat zien wat erin staat, voordat er iets verandert. Nu staan je instellingen erin; je leervoortgang komt erbij zodra er lessen zijn."
+      footer="Een back-up is één bestand met je instellingen en je oefenrondes van dit apparaat. Bewaar het buiten de app, bijvoorbeeld in iCloud Drive of OneDrive; op de iPad kun je Delen kiezen en dan Bewaar in Bestanden. Bij terugzetten controleert de app het bestand en laat zien wat erin staat, voordat er iets verandert."
     >
       <GroupedRow>
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
@@ -285,7 +289,8 @@ export function BackupSection() {
               </ul>
             ) : (
               <p className="text-footnote text-secondary">
-                Je instellingen worden die uit de back-up.
+                Je instellingen worden die uit de back-up. Je oefenrondes op dit
+                apparaat blijven staan.
               </p>
             )}
             <div className="-mb-2 -ms-3 flex flex-wrap">

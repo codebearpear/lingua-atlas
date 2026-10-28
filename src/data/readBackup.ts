@@ -4,12 +4,15 @@
  */
 import { z } from 'zod'
 import { THEME_PREFERENCES } from '../app/theme'
+import { LANGUAGE_CODES } from '../content/languageCodes'
+import { ERROR_TYPES } from '../packs/kinds'
 import {
   BACKUP_FORMAT,
   BACKUP_FORMAT_VERSION,
   checksumOf,
   type Backup,
 } from './backup'
+import type { PracticeRound } from './database'
 
 const backupSchema = z.strictObject({
   format: z.literal(BACKUP_FORMAT),
@@ -32,7 +35,40 @@ const versionsSchema = z.looseObject({
   database: z.looseObject({ version: z.int().positive() }),
 })
 
-export type BackupProblem = 'json' | 'format' | 'version' | 'checksum'
+/**
+ * Records van de tabellen in BACKUP_TABLES (backupStore.ts). Een record mag
+ * velden hebben die deze versie niet kent; die blijven bewaard.
+ */
+const roundSchema = z.looseObject({
+  id: z.string().min(1),
+  language: z.enum(LANGUAGE_CODES),
+  lesson: z.string(),
+  packVersion: z.string(),
+  startedAt: z.number(),
+  finishedAt: z.number().optional(),
+  updatedAt: z.number(),
+  answers: z.array(
+    z.looseObject({
+      exerciseId: z.string(),
+      type: z.enum(['multiple-choice', 'typed-answer']),
+      direction: z.enum(['to-dutch', 'to-target']),
+      items: z.array(z.string()),
+      given: z.string(),
+      verdict: z.enum(['correct', 'almost', 'wrong']),
+      errorType: z.enum(ERROR_TYPES).optional(),
+      overridden: z.boolean(),
+      answeredAt: z.number(),
+    }),
+  ),
+}) satisfies z.ZodType<PracticeRound>
+
+const RECORD_SCHEMAS: ReadonlyMap<string, z.ZodType> = new Map<
+  string,
+  z.ZodType
+>([['rounds', roundSchema]])
+
+export type BackupProblem =
+  'json' | 'format' | 'version' | 'checksum' | 'records'
 
 export type BackupReading =
   | { ok: true; backup: Backup }
@@ -46,6 +82,8 @@ const MESSAGES: Record<BackupProblem, string> = {
     'Deze back-up komt uit een nieuwere versie van Lingua Atlas. Werk de app eerst bij en probeer het dan opnieuw.',
   checksum:
     'Het controlegetal klopt niet: het bestand is beschadigd of aangepast. Gebruik een andere back-up.',
+  records:
+    'In deze back-up staan gegevens die niet kloppen, dus de app zet hem niet terug. Gebruik een andere back-up.',
 }
 
 function problem(kind: BackupProblem): BackupReading {
@@ -54,7 +92,8 @@ function problem(kind: BackupProblem): BackupReading {
 
 /**
  * Leest en controleert een back-upbestand: geldige JSON, het juiste formaat,
- * versies die deze app kent en een kloppend controlegetal.
+ * versies die deze app kent, een kloppend controlegetal en records die de app
+ * kan gebruiken.
  */
 export async function readBackup(
   text: string,
@@ -83,6 +122,15 @@ export async function readBackup(
   const { checksum, ...content } = parsed.data
   if ((await checksumOf(content)) !== checksum.value) {
     return problem('checksum')
+  }
+  for (const [name, records] of Object.entries(parsed.data.tables)) {
+    const schema = RECORD_SCHEMAS.get(name)
+    if (
+      schema !== undefined &&
+      !records.every((record) => schema.safeParse(record).success)
+    ) {
+      return problem('records')
+    }
   }
   return { ok: true, backup: parsed.data }
 }

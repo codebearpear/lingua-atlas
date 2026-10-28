@@ -59,7 +59,9 @@ Bij het bouwen zet een Vite-plug-in (`scripts/packs.ts`) elk gecontroleerd pakke
 
 ## Oefenen
 
-Op de pagina van een les staat een knop om te oefenen. Je doet de oefeningen van de les na elkaar: meerkeuze en getypte antwoorden. Onder het invoerveld staan knoppen voor tekens die op een Nederlands toetsenbord lastig zijn, zoals á, ñ en ¿ voor het Spaans en ä en ß voor het Duits; voor een taal met een eigen schrift gebruik je het toetsenbord van die taal. Na elk antwoord zie je het oordeel met uitleg. Is je antwoord goed, maar staat het niet in de sleutel, dan tik je op Mijn antwoord klopt toch. Aan het eind zie je per oefening wat je antwoordde. Je antwoorden worden nog niet bewaard.
+Op de pagina van een les staat een knop om te oefenen. Je doet de oefeningen van de les na elkaar: meerkeuze en getypte antwoorden. Onder het invoerveld staan knoppen voor tekens die op een Nederlands toetsenbord lastig zijn, zoals á, ñ en ¿ voor het Spaans en ä en ß voor het Duits; voor een taal met een eigen schrift gebruik je het toetsenbord van die taal. Na elk antwoord zie je het oordeel met uitleg. Is je antwoord goed, maar staat het niet in de sleutel, dan tik je op Mijn antwoord klopt toch. Aan het eind zie je per oefening wat je antwoordde.
+
+De app bewaart de ronde na elk antwoord op je apparaat, ook als je halverwege stopt (`src/data/rounds.ts`). Bij elk antwoord staat wat de oefening toetste: de woorden, herkennen of zelf maken, en het oordeel. De lespagina toont je laatste afgeronde ronde. De rondes gaan mee in de back-up. Ze tellen nog niet mee voor herhalen; dat komt in een volgende fase.
 
 ## Antwoordcontrole
 
@@ -76,7 +78,7 @@ Bekende foute antwoorden in het pakket krijgen hun eigen uitleg en fouttype. Ant
 Lingua Atlas bewaart alles op je eigen apparaat, in de database van de browser (IndexedDB, via Dexie; zie `src/data/database.ts`). Er gaat niets naar een server. Onder Instellingen zie je:
 
 - **Opslag:** hoeveel ruimte de app gebruikt, de bovengrens van de browser en of de browser je gegevens blijvend bewaart. De geïnstalleerde app vraagt dat bij het opstarten zelf aan.
-- **Back-up:** één bestand met je gegevens, om buiten de app te bewaren. Op de pc download je het; op de iPad kun je het delen en in Bestanden bewaren. Bij terugzetten controleert de app het bestand en laat zien wat erin staat, voordat er iets verandert. Het formaat staat in [`docs/backup-format.md`](docs/backup-format.md).
+- **Back-up:** één bestand met je instellingen en je oefenrondes, om buiten de app te bewaren. Op de pc download je het; op de iPad kun je het delen en in Bestanden bewaren. Bij terugzetten controleert de app het bestand en laat zien wat erin staat, voordat er iets verandert. Het formaat staat in [`docs/backup-format.md`](docs/backup-format.md).
 - **Foutenlogboek:** gaat er iets mis, dan komt de melding hier. Kopieer het logboek en geef het aan Claude. Loopt de app vast, dan zie je een uitleg in plaats van een leeg scherm.
 - **Versie:** de commit waaruit GitHub de app heeft gebouwd.
 
