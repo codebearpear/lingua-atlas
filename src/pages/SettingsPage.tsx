@@ -1,3 +1,4 @@
+import { StorageSection } from '../app/StorageSection'
 import { THEME_PREFERENCES, type ThemePreference } from '../app/theme'
 import { setThemePreference, useThemePreference } from '../app/themeStore'
 import { GroupedRow, GroupedSection, PageHeader } from '../app/ui'
@@ -107,6 +108,8 @@ export function SettingsPage() {
             <PackRow key={language.code} language={language} />
           ))}
         </GroupedSection>
+
+        <StorageSection />
 
         <GroupedSection
           id="over"

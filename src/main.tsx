@@ -8,9 +8,12 @@ import '@fontsource-variable/vazirmatn/wght.css'
 import './index.css'
 import App from './App.tsx'
 import { UpdatePrompt } from './app/UpdatePrompt.tsx'
+import { isInstalledApp, persistWhenInstalled } from './app/storage'
 import { initTheme } from './app/themeStore'
 
 initTheme()
+// In de geïnstalleerde app meteen blijvende opslag aanvragen.
+void persistWhenInstalled(isInstalledApp())
 
 const rootElement = document.getElementById('root')
 
