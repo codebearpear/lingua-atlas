@@ -1,3 +1,4 @@
+import { BackupSection } from '../app/BackupSection'
 import { LogSection } from '../app/LogSection'
 import { StorageSection } from '../app/StorageSection'
 import { THEME_PREFERENCES, type ThemePreference } from '../app/theme'
@@ -112,6 +113,8 @@ export function SettingsPage() {
         </GroupedSection>
 
         <StorageSection />
+
+        <BackupSection />
 
         <LogSection />
 
