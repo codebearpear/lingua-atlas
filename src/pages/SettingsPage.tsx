@@ -1,8 +1,10 @@
+import { LogSection } from '../app/LogSection'
 import { StorageSection } from '../app/StorageSection'
 import { THEME_PREFERENCES, type ThemePreference } from '../app/theme'
 import { setThemePreference, useThemePreference } from '../app/themeStore'
 import { GroupedRow, GroupedSection, PageHeader } from '../app/ui'
 import { usePageTitle } from '../app/usePageTitle'
+import { BUILD_ID } from '../app/version'
 import { LANGUAGES, type Language } from '../content/languages'
 import { packSummary } from '../content/packs'
 import { STATUS_LABELS, lowestStatus, type PackCounts } from '../packs/summary'
@@ -111,6 +113,8 @@ export function SettingsPage() {
 
         <StorageSection />
 
+        <LogSection />
+
         <GroupedSection
           id="over"
           title="Over Lingua Atlas"
@@ -120,6 +124,12 @@ export function SettingsPage() {
             <div className="flex justify-between gap-4">
               <span>Status</span>
               <span className="text-secondary">In ontwikkeling</span>
+            </div>
+          </GroupedRow>
+          <GroupedRow>
+            <div className="flex justify-between gap-4">
+              <span>Versie</span>
+              <span className="text-secondary">{BUILD_ID}</span>
             </div>
           </GroupedRow>
           <GroupedRow>

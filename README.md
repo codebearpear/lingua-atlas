@@ -45,6 +45,14 @@ Elk onderdeel heeft een validatiestatus:
 
 In de app staat onder Instellingen, bij Taalpakketten, per taal wat het pakket bevat en welke status het heeft. Dat is de laagste status van alles in het pakket, zodat de app nooit meer belooft dan voor elk onderdeel geldt.
 
+## Je gegevens
+
+Lingua Atlas bewaart alles op je eigen apparaat, in de database van de browser (IndexedDB, via Dexie; zie `src/data/database.ts`). Er gaat niets naar een server. Onder Instellingen zie je:
+
+- **Opslag:** hoeveel ruimte de app gebruikt, de bovengrens van de browser en of de browser je gegevens blijvend bewaart. De geïnstalleerde app vraagt dat bij het opstarten zelf aan.
+- **Foutenlogboek:** gaat er iets mis, dan komt de melding hier. Kopieer het logboek en geef het aan Claude. Loopt de app vast, dan zie je een uitleg in plaats van een leeg scherm.
+- **Versie:** de commit waaruit GitHub de app heeft gebouwd.
+
 ## Licenties
 
 - **Code:** MIT-licentie, zie [`LICENSE`](LICENSE).
@@ -54,4 +62,4 @@ In de app staat onder Instellingen, bij Taalpakketten, per taal wat het pakket b
 
 ## Techniek
 
-React, TypeScript en Vite, als installeerbare webapp (PWA) via vite-plugin-pwa. Opmaak met Tailwind CSS, in de stijl van Apple (Human Interface Guidelines); de kleuren en tekststijlen staan in `src/index.css`. Taalpakketten gecontroleerd met Zod. Tests met Vitest. GitHub Actions controleert elke wijziging en publiceert naar GitHub Pages.
+React, TypeScript en Vite, als installeerbare webapp (PWA) via vite-plugin-pwa. Opmaak met Tailwind CSS, in de stijl van Apple (Human Interface Guidelines); de kleuren en tekststijlen staan in `src/index.css`. Gegevens in IndexedDB via Dexie. Taalpakketten gecontroleerd met Zod. Tests met Vitest en fake-indexeddb. GitHub Actions controleert elke wijziging en publiceert naar GitHub Pages.

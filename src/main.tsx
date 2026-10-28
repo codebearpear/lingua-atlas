@@ -7,10 +7,13 @@ import '@fontsource-variable/noto-sans-myanmar/wght.css'
 import '@fontsource-variable/vazirmatn/wght.css'
 import './index.css'
 import App from './App.tsx'
+import { ErrorBoundary } from './app/ErrorBoundary.tsx'
 import { UpdatePrompt } from './app/UpdatePrompt.tsx'
 import { isInstalledApp, persistWhenInstalled } from './app/storage'
 import { initTheme } from './app/themeStore'
+import { captureErrors } from './data/errorLog'
 
+captureErrors()
 initTheme()
 // In de geïnstalleerde app meteen blijvende opslag aanvragen.
 void persistWhenInstalled(isInstalledApp())
@@ -23,7 +26,10 @@ if (rootElement === null) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <App />
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
+    {/* Buiten de foutopvang, zodat je na een fout nog kunt bijwerken. */}
     <UpdatePrompt />
   </StrictMode>,
 )

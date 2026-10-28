@@ -4,10 +4,16 @@ import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import { packSummaries } from './scripts/packs.ts'
 
+// De versie van de app: bij GitHub de commit, op je pc "lokaal".
+const BUILD_ID = process.env.GITHUB_SHA?.slice(0, 7) ?? 'lokaal'
+
 // https://vite.dev/config/
 export default defineConfig({
   // De app staat op https://codebearpear.github.io/lingua-atlas/
   base: '/lingua-atlas/',
+  define: {
+    __BUILD_ID__: JSON.stringify(BUILD_ID),
+  },
   plugins: [
     react(),
     tailwindcss(),
