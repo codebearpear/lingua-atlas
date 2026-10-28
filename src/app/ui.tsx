@@ -1,5 +1,52 @@
 import type { ReactNode } from 'react'
+import {
+  STATUS_LABELS,
+  STATUS_ORDER,
+  type EffectiveStatus,
+} from '../packs/summary'
 import { SymbolIcon, type SymbolName } from './Icons'
+import { followBackLink } from './navigation'
+
+/** De terugknop boven een pagina, zoals linksboven in een app op de iPad. */
+export function BackLink({ href, label }: { href: string; label: string }) {
+  return (
+    <a
+      href={href}
+      onClick={(event) => {
+        followBackLink(event, href)
+      }}
+      className="-ms-2.5 mb-3 inline-flex min-h-11 items-center gap-0.5 rounded-full ps-1 pe-3 text-body text-tint transition-colors hover:bg-muted"
+    >
+      <SymbolIcon name="chevron-left" className="size-6 shrink-0" />
+      {label}
+    </a>
+  )
+}
+
+/**
+ * Het label met de validatiestatus. De stippen tonen de trede: geen bij
+ * Concept, drie bij Expert-beoordeeld. De afronding is de helft van één
+ * regel hoog, zodat het label ook netjes blijft als de tekst moet afbreken.
+ */
+export function StatusBadge({ status }: { status: EffectiveStatus }) {
+  const step = STATUS_ORDER.indexOf(status)
+  return (
+    <span className="inline-flex items-center gap-2 rounded-[0.8125rem] bg-muted px-2.5 py-1 text-footnote font-medium text-secondary">
+      <span aria-hidden="true" className="flex gap-[3px]">
+        {[1, 2, 3].map((dot) => (
+          <span
+            key={dot}
+            className={`size-1.5 rounded-full bg-current ${dot <= step ? '' : 'opacity-25'}`}
+          />
+        ))}
+      </span>
+      <span>
+        <span className="sr-only">Status: </span>
+        {STATUS_LABELS[status]}
+      </span>
+    </span>
+  )
+}
 
 /** De grote titel bovenaan een pagina, zoals in de apps van Apple. */
 export function PageHeader({

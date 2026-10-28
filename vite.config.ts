@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
-import { packSummaries } from './scripts/packs.ts'
+import { languagePacks } from './scripts/packs.ts'
 
 // De versie van de app: bij GitHub de commit, op je pc "lokaal".
 const BUILD_ID = process.env.GITHUB_SHA?.slice(0, 7) ?? 'lokaal'
@@ -17,8 +17,8 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    // Samenvatting van de taalpakketten voor de app; fouten laten het bouwen mislukken
-    packSummaries(),
+    // Samenvattingen en lespakketten voor de app; fouten laten het bouwen mislukken
+    languagePacks(),
     VitePWA({
       // Een nieuwe versie wordt pas actief als je op "Vernieuwen" tikt.
       registerType: 'prompt',

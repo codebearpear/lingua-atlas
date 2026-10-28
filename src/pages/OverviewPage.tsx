@@ -1,51 +1,48 @@
+import { SymbolIcon } from '../app/Icons'
+import { LanguageIcon } from '../app/LanguageIcon'
+import { pageHref } from '../app/routes'
 import { ContentUnavailable, PageHeader, SectionHeading } from '../app/ui'
 import { usePageTitle } from '../app/usePageTitle'
-import {
-  LANGUAGES,
-  type Language,
-  type LanguageCode,
-} from '../content/languages'
+import { LANGUAGES, type Language } from '../content/languages'
 import { packSummary } from '../content/packs'
 
-/** Een kleur per taal voor het pictogram; alleen ter herkenning, zonder betekenis. */
-const TILE_COLORS: Record<LanguageCode, string> = {
-  en: 'from-[#4a8dff] to-[#1763e4]',
-  de: 'from-[#ff5a5f] to-[#e9152d]',
-  es: 'from-[#ff9a3d] to-[#c55300]',
-  ko: 'from-[#8a80ff] to-[#564ade]',
-  hi: 'from-[#2fbf68] to-[#008932]',
-  fa: 'from-[#25b9cc] to-[#008198]',
-  my: 'from-[#d660e8] to-[#b02fc2]',
-}
-
-/** Wat er voor een taal klaarstaat. Lessen zijn pas te doen als de lesmotor er is. */
-function lessonsLabel(code: LanguageCode): string {
-  const { lessons } = packSummary(code).counts
+/** Hoeveel lessen er voor een taal klaarstaan. */
+function lessonsLabel(language: Language): string {
+  const { lessons } = packSummary(language.code).counts
   if (lessons === 0) {
     return 'Nog geen lessen'
   }
-  return `${lessons} ${lessons === 1 ? 'les' : 'lessen'} in voorbereiding`
+  return `${lessons} ${lessons === 1 ? 'les' : 'lessen'}`
 }
 
+/**
+ * Een tegel per taal. De hele tegel opent de cursus; voor schermlezers is de
+ * naam van de taal de link en de rest gewone tekst.
+ */
 function LanguageTile({ language }: { language: Language }) {
   return (
-    <article className="flex h-full flex-col rounded-card bg-surface p-5">
+    <article className="relative flex h-full flex-col rounded-card bg-surface p-5 transition-transform active:scale-[0.98] has-[a:focus-visible]:outline-3 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-tint/70">
       <div className="flex items-center gap-4">
-        <span
-          aria-hidden="true"
-          lang={language.locale}
-          className={`flex size-14 shrink-0 items-center justify-center rounded-[22.5%] bg-linear-to-b text-title2 font-semibold text-white ${TILE_COLORS[language.code]}`}
-        >
-          {language.glyph}
-        </span>
-        <div className="min-w-0">
-          <h3 className="text-body font-semibold">{language.dutchName}</h3>
+        <LanguageIcon language={language} className="size-14 text-title2" />
+        <div className="min-w-0 flex-1">
+          <h3 className="text-body font-semibold">
+            <a
+              href={pageHref({ page: 'course', language: language.code })}
+              className="after:absolute after:inset-0 after:rounded-card focus-visible:outline-none"
+            >
+              {language.dutchName}
+            </a>
+          </h3>
           <p className="text-subhead text-secondary">
             <span lang={language.locale} dir={language.direction}>
               {language.nativeName}
             </span>
           </p>
         </div>
+        <SymbolIcon
+          name="chevron-right"
+          className="size-5 shrink-0 text-secondary/60"
+        />
       </div>
       <dl className="mt-4 divide-y-[0.5px] divide-separator text-subhead">
         <div className="flex justify-between gap-4 py-2">
@@ -59,7 +56,7 @@ function LanguageTile({ language }: { language: Language }) {
       </dl>
       <p className="mt-auto pt-3">
         <span className="inline-flex rounded-full bg-muted px-2.5 py-1 text-footnote font-medium text-secondary">
-          {lessonsLabel(language.code)}
+          {lessonsLabel(language)}
         </span>
       </p>
     </article>
@@ -73,8 +70,9 @@ export function OverviewPage() {
     <>
       <PageHeader title="Overzicht">
         <p>
-          Je persoonlijke taalatlas, met het Nederlands als vertrekpunt. Lessen,
-          herhalingen en statistieken komen in de volgende versies.
+          Je persoonlijke taalatlas, met het Nederlands als vertrekpunt. Open
+          een taal voor de lessen; oefenen, herhalen en statistieken komen in de
+          volgende versies.
         </p>
       </PageHeader>
 

@@ -24,6 +24,15 @@ export const STATUS_LABELS: Record<EffectiveStatus, string> = {
   'expert-reviewed': 'Expert-beoordeeld',
 }
 
+/** Wat een status betekent, als vervolg op de naam: "Concept: nog niet gecontroleerd." */
+export const STATUS_DESCRIPTIONS: Record<EffectiveStatus, string> = {
+  draft: 'nog niet gecontroleerd.',
+  'auto-checked':
+    'de vorm klopt, zoals de tekens en de antwoorden; de taal zelf heeft nog geen mens nagekeken.',
+  'source-verified': 'nagelopen tegen een gezaghebbende bron.',
+  'expert-reviewed': 'beoordeeld door een deskundige.',
+}
+
 export interface PackCounts {
   sources: number
   words: number
@@ -42,15 +51,20 @@ export interface PackSummary {
   statuses: Record<EffectiveStatus, number>
 }
 
+/** De laagste van een reeks statussen; zonder statussen is dat Concept. */
+export function lowestOf(statuses: Iterable<EffectiveStatus>): EffectiveStatus {
+  const present = new Set(statuses)
+  return STATUS_ORDER.find((status) => present.has(status)) ?? 'draft'
+}
+
 /**
  * De laagste status van alles in het pakket, de taalgegevens meegerekend.
  * Zo belooft de app nooit meer dan voor elk onderdeel geldt.
  */
 export function lowestStatus(summary: PackSummary): EffectiveStatus {
-  const present = new Set<EffectiveStatus>([
+  return lowestOf([
     summary.manifestStatuses.language,
     summary.manifestStatuses.names,
     ...STATUS_ORDER.filter((status) => summary.statuses[status] > 0),
   ])
-  return STATUS_ORDER.find((status) => present.has(status)) ?? 'draft'
 }

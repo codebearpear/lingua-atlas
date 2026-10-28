@@ -1,14 +1,21 @@
 import { BackupSection } from '../app/BackupSection'
 import { LogSection } from '../app/LogSection'
 import { StorageSection } from '../app/StorageSection'
+import { count } from '../app/format'
 import { THEME_LABELS, THEME_PREFERENCES } from '../app/theme'
 import { setThemePreference, useThemePreference } from '../app/themeStore'
-import { GroupedRow, GroupedSection, PageHeader } from '../app/ui'
+import { GroupedRow, GroupedSection, PageHeader, StatusBadge } from '../app/ui'
 import { usePageTitle } from '../app/usePageTitle'
 import { BUILD_ID } from '../app/version'
 import { LANGUAGES, type Language } from '../content/languages'
 import { packSummary } from '../content/packs'
-import { STATUS_LABELS, lowestStatus, type PackCounts } from '../packs/summary'
+import {
+  STATUS_DESCRIPTIONS,
+  STATUS_LABELS,
+  STATUS_ORDER,
+  lowestStatus,
+  type PackCounts,
+} from '../packs/summary'
 
 /** Een segmentknop zoals in iOS, gebouwd op gewone keuzerondjes. */
 function ThemeSegments() {
@@ -42,10 +49,6 @@ function ThemeSegments() {
   )
 }
 
-function count(amount: number, one: string, many: string): string {
-  return `${amount} ${amount === 1 ? one : many}`
-}
-
 /** Wat er in een pakket staat, in een regel. */
 function contentLine(counts: PackCounts): string {
   if (counts.units === 0 && counts.words === 0 && counts.sentences === 0) {
@@ -59,6 +62,14 @@ function contentLine(counts: PackCounts): string {
   ].join(' · ')
 }
 
+/** Uitleg onder de taalpakketten: wat elke status betekent. */
+const STATUS_FOOTER = [
+  'De status is de laagste van alles in het pakket.',
+  ...STATUS_ORDER.map(
+    (status) => `${STATUS_LABELS[status]}: ${STATUS_DESCRIPTIONS[status]}`,
+  ),
+].join(' ')
+
 function PackRow({ language }: { language: Language }) {
   const summary = packSummary(language.code)
   return (
@@ -70,9 +81,7 @@ function PackRow({ language }: { language: Language }) {
             {contentLine(summary.counts)}
           </p>
         </div>
-        <p className="text-subhead text-secondary">
-          {STATUS_LABELS[lowestStatus(summary)]}
-        </p>
+        <StatusBadge status={lowestStatus(summary)} />
       </div>
     </GroupedRow>
   )
@@ -99,7 +108,7 @@ export function SettingsPage() {
         <GroupedSection
           id="pakketten"
           title="Taalpakketten"
-          footer="De status is de laagste van alles in het pakket. Concept: nog niet gecontroleerd. Automatisch gecontroleerd: de vorm klopt, zoals de tekens en de antwoorden; de taal zelf heeft nog geen mens nagekeken. Bron-geverifieerd: nagelopen tegen een gezaghebbende bron. Expert-beoordeeld: beoordeeld door een deskundige."
+          footer={STATUS_FOOTER}
         >
           {LANGUAGES.map((language) => (
             <PackRow key={language.code} language={language} />

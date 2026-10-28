@@ -80,9 +80,23 @@ export function NavIcon({
 }
 
 export type SymbolName =
-  'calendar-check' | 'checkmark-circle' | 'question-circle'
+  | 'book'
+  | 'calendar-check'
+  | 'checkmark-circle'
+  | 'chevron-left'
+  | 'chevron-right'
+  | 'exclamation-circle'
+  | 'globe'
+  | 'question-circle'
 
 const SYMBOLS: Record<SymbolName, ReactNode> = {
+  // Een open boek
+  book: (
+    <>
+      <path d="M12 6.8C10.2 5.5 7.6 4.8 4 4.8v13.4c3.6 0 6.2.7 8 2 1.8-1.3 4.4-2 8-2V4.8c-3.6 0-6.2.7-8 2Z" />
+      <path d="M12 6.8v13.4" />
+    </>
+  ),
   'calendar-check': (
     <>
       <rect x="3.5" y="5" width="17" height="15.5" rx="3" />
@@ -94,6 +108,23 @@ const SYMBOLS: Record<SymbolName, ReactNode> = {
     <>
       <circle cx="12" cy="12" r="9" />
       <path d="m8 12.5 2.8 2.7L16 9.8" />
+    </>
+  ),
+  // Pijlpunten, zoals de terugknop en de pijl achter een rij die je opent
+  'chevron-left': <path d="m14.5 5-7 7 7 7" />,
+  'chevron-right': <path d="m9.5 5 7 7-7 7" />,
+  'exclamation-circle': (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7.5v5.5" />
+      <path d="M12 16.6h.01" />
+    </>
+  ),
+  globe: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <ellipse cx="12" cy="12" rx="3.8" ry="9" />
+      <path d="M3 12h18" />
     </>
   ),
   'question-circle': (

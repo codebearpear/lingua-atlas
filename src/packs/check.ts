@@ -21,9 +21,11 @@ import {
   vocabularyFileSchema,
   type Exercise,
   type PackManifest,
+  type Sentence,
   type Source,
   type Unit,
   type Verification,
+  type Word,
 } from './schema.ts'
 import { rulesFor } from './scripts.ts'
 import type { EffectiveStatus, PackCounts } from './summary.ts'
@@ -62,6 +64,10 @@ export interface PackReport {
     { language: EffectiveStatus; names: EffectiveStatus } | undefined
   /** Aantal lesonderdelen per status: woorden, zinnen, eenheden, lessen en oefeningen. */
   statuses: Record<EffectiveStatus, number>
+  /** De status van elk lesonderdeel, op kenmerk. */
+  itemStatuses: Record<string, EffectiveStatus>
+  /** De inhoud die door het schema kwam; bestanden met schemafouten ontbreken. */
+  content: { words: Word[]; sentences: Sentence[]; units: Unit[] }
 }
 
 export interface CheckOptions {
@@ -881,8 +887,11 @@ export function checkPack(input: PackInput, options: CheckOptions): PackReport {
     'source-verified': 0,
     'expert-reviewed': 0,
   }
+  const itemStatuses: Record<string, EffectiveStatus> = {}
   for (const [id, record] of items) {
-    statuses[effectiveStatus(record.verification, id, flagged)] += 1
+    const status = effectiveStatus(record.verification, id, flagged)
+    itemStatuses[id] = status
+    statuses[status] += 1
   }
 
   return {
@@ -924,6 +933,8 @@ export function checkPack(input: PackInput, options: CheckOptions): PackReport {
             ),
           },
     statuses,
+    itemStatuses,
+    content: { words, sentences, units: units.map(({ unit }) => unit) },
   }
 }
 

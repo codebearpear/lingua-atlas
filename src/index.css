@@ -105,6 +105,16 @@
   --text-caption2--line-height: 0.8125rem;
 
   --radius-card: 1.375rem;
+
+  /* Iets dat pas na een korte pauze verschijnt, zoals een laadmelding: zo
+     flitst het niet als het laden snel gaat. */
+  --animate-appear: appear 0.2s ease-out 0.4s both;
+
+  @keyframes appear {
+    from {
+      opacity: 0;
+    }
+  }
 }
 
 /* Het glas van Apple's "Liquid Glass", benaderd met vervaging en een lichte rand */

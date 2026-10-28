@@ -7,19 +7,10 @@
  * alleen wat bij jou hoort: je beginniveau per taal.
  */
 import type { PackManifest } from '../packs/schema'
+import { LANGUAGE_CODES, type LanguageCode } from './languageCodes'
 
-export type LanguageCode = 'en' | 'de' | 'es' | 'ko' | 'hi' | 'fa' | 'my'
-
-/** De volgorde waarin de app de talen toont. */
-export const LANGUAGE_CODES: readonly LanguageCode[] = [
-  'en',
-  'de',
-  'es',
-  'ko',
-  'hi',
-  'fa',
-  'my',
-]
+export { isLanguageCode, LANGUAGE_CODES } from './languageCodes'
+export type { LanguageCode } from './languageCodes'
 
 export interface Language {
   code: LanguageCode
@@ -43,8 +34,8 @@ export interface Language {
 }
 
 /**
- * Jouw beginniveau per taal. Dit verhuist in fase 4 naar je eigen gegevens op
- * het apparaat.
+ * Jouw beginniveau per taal. Dit verhuist naar je eigen gegevens op het
+ * apparaat zodra je het zelf kunt bepalen, met de diagnosetoets uit fase 8.
  */
 const START_LEVELS: Record<LanguageCode, string> = {
   en: 'C1, gecertificeerd (Cambridge)',
@@ -86,3 +77,11 @@ export const LANGUAGES: readonly Language[] = LANGUAGE_CODES.map((code) => {
     framework: levels.description,
   }
 })
+
+export function languageInfo(code: LanguageCode): Language {
+  const language = LANGUAGES.find((candidate) => candidate.code === code)
+  if (language === undefined) {
+    throw new Error(`De taal ${code} ontbreekt.`)
+  }
+  return language
+}

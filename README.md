@@ -30,7 +30,7 @@ Elke taal heeft een eigen pakket in `content/packs/<taal>/`:
 | `vocabulary.json` en `sentences.json` | Woorden en zinnen                                       |
 | `units/<eenheid>.json`                | Eenheden met lessen en oefeningen                       |
 
-Het Spaanse pakket bevat een eerste voorbeeld: de eenheid Begroeten en voorstellen, met twee lessen. Lessen volgen kan nog niet; dat komt in een latere fase.
+Het Spaanse pakket bevat een eerste voorbeeld: de eenheid Begroeten en voorstellen, met twee lessen.
 
 Het formaat staat in `src/packs/schema.ts`, de regels in `src/packs/check.ts`. `npm run pakketten` controleert alle pakketten, ook binnen `npm run check` en op GitHub. Een fout houdt publicatie tegen; een waarschuwing niet, maar het onderdeel blijft dan op Concept staan.
 
@@ -44,6 +44,14 @@ Elk onderdeel heeft een validatiestatus:
 - **Expert-beoordeeld:** beoordeeld door een gekwalificeerde mens, met naam, kwalificatie en datum.
 
 In de app staat onder Instellingen, bij Taalpakketten, per taal wat het pakket bevat en welke status het heeft. Dat is de laagste status van alles in het pakket, zodat de app nooit meer belooft dan voor elk onderdeel geldt.
+
+## Lessen
+
+Tik in het overzicht op een taal voor de cursus: de eenheden op volgorde, elk met haar lessen. Een les toont wat je leert, de uitleg met voorbeeldzinnen, cultuur, de woorden met hun vertaling en hoeveel oefeningen erbij horen. Oefenen kan nog niet; dat komt in fase 6.
+
+Elke les en eenheid toont haar status. Die van een les is de laagste van de les zelf en alles wat ze toont: woorden, voorbeeldzinnen en oefeningen. Die van een eenheid is de laagste van de eenheid en haar lessen.
+
+Bij het bouwen zet een Vite-plug-in (`scripts/packs.ts`) elk gecontroleerd pakket om in een lespakket voor de app (`src/packs/compile.ts`). De app laadt het lespakket van een taal pas als je die taal opent; de service worker bewaart het, zodat lessen ook zonder internet werken.
 
 ## Je gegevens
 

@@ -5,6 +5,9 @@
  * Zo werkt elke pagina ook op GitHub Pages en zonder internet, zonder extra
  * instellingen op de server.
  */
+import { isLanguageCode, type LanguageCode } from '../content/languageCodes'
+
+/** De onderdelen in het hoofdmenu. */
 export type RouteId = 'overview' | 'scripts' | 'settings'
 
 export interface Route {
@@ -19,15 +22,64 @@ export const ROUTES: readonly Route[] = [
   { id: 'settings', path: '/instellingen', label: 'Instellingen' },
 ]
 
+/** Een pagina, met wat erbij hoort, zoals de taal van een cursus. */
+export type Page =
+  | { page: RouteId }
+  | { page: 'course'; language: LanguageCode }
+  | { page: 'lesson'; language: LanguageCode; lesson: string }
+
+const ID = '[a-z0-9]+(?:-[a-z0-9]+)*'
+const COURSE = /^\/taal\/([a-z]+)$/u
+const LESSON = new RegExp(`^/taal/([a-z]+)/les/(${ID})$`, 'u')
+
 /** Zet de hash uit de adresbalk om naar een pagina, of `null` als die niet bestaat. */
-export function routeFromHash(hash: string): RouteId | null {
+export function pageFromHash(hash: string): Page | null {
   const path = hash.replace(/^#/u, '') || '/'
   const normalized = path.length > 1 ? path.replace(/\/+$/u, '') : path
-  return ROUTES.find((route) => route.path === normalized)?.id ?? null
+
+  const route = ROUTES.find((candidate) => candidate.path === normalized)
+  if (route !== undefined) {
+    return { page: route.id }
+  }
+
+  const course = COURSE.exec(normalized)
+  if (course?.[1] !== undefined && isLanguageCode(course[1])) {
+    return { page: 'course', language: course[1] }
+  }
+
+  const lesson = LESSON.exec(normalized)
+  if (
+    lesson?.[1] !== undefined &&
+    lesson[2] !== undefined &&
+    isLanguageCode(lesson[1])
+  ) {
+    return { page: 'lesson', language: lesson[1], lesson: lesson[2] }
+  }
+
+  return null
 }
 
-/** De link naar een pagina, voor het href-attribuut. */
+/** De link naar een onderdeel van het hoofdmenu, voor het href-attribuut. */
 export function hrefFor(id: RouteId): string {
   const route = ROUTES.find((candidate) => candidate.id === id)
   return `#${route?.path ?? '/'}`
+}
+
+/** De link naar een pagina, voor het href-attribuut. */
+export function pageHref(page: Page): string {
+  switch (page.page) {
+    case 'course':
+      return `#/taal/${page.language}`
+    case 'lesson':
+      return `#/taal/${page.language}/les/${page.lesson}`
+    default:
+      return hrefFor(page.page)
+  }
+}
+
+/** Bij welk onderdeel van het hoofdmenu een pagina hoort. Cursussen horen bij het overzicht. */
+export function sectionOf(page: Page): RouteId {
+  return page.page === 'course' || page.page === 'lesson'
+    ? 'overview'
+    : page.page
 }

@@ -1,31 +1,74 @@
 import { describe, expect, it } from 'vitest'
-import { hrefFor, routeFromHash } from './routes'
+import { hrefFor, pageFromHash, pageHref, sectionOf } from './routes'
 
-describe('routeFromHash', () => {
+describe('pageFromHash', () => {
   it('opent het overzicht als er geen pagina in het adres staat', () => {
-    expect(routeFromHash('')).toBe('overview')
-    expect(routeFromHash('#')).toBe('overview')
-    expect(routeFromHash('#/')).toBe('overview')
+    expect(pageFromHash('')).toEqual({ page: 'overview' })
+    expect(pageFromHash('#')).toEqual({ page: 'overview' })
+    expect(pageFromHash('#/')).toEqual({ page: 'overview' })
   })
 
   it('herkent de instellingen, ook met een schuine streep aan het eind', () => {
-    expect(routeFromHash('#/instellingen')).toBe('settings')
-    expect(routeFromHash('#/instellingen/')).toBe('settings')
+    expect(pageFromHash('#/instellingen')).toEqual({ page: 'settings' })
+    expect(pageFromHash('#/instellingen/')).toEqual({ page: 'settings' })
   })
 
   it('herkent de schrifttest', () => {
-    expect(routeFromHash('#/schrifttest')).toBe('scripts')
+    expect(pageFromHash('#/schrifttest')).toEqual({ page: 'scripts' })
+  })
+
+  it('herkent de cursus van een taal', () => {
+    expect(pageFromHash('#/taal/es')).toEqual({
+      page: 'course',
+      language: 'es',
+    })
+  })
+
+  it('herkent een les', () => {
+    expect(pageFromHash('#/taal/es/les/a1-begroeten-hallo')).toEqual({
+      page: 'lesson',
+      language: 'es',
+      lesson: 'a1-begroeten-hallo',
+    })
   })
 
   it('geeft null bij een pagina die niet bestaat', () => {
-    expect(routeFromHash('#/bestaat-niet')).toBeNull()
+    expect(pageFromHash('#/bestaat-niet')).toBeNull()
+    expect(pageFromHash('#/taal/fr')).toBeNull()
+    expect(pageFromHash('#/taal/es/les/Niet_Geldig')).toBeNull()
   })
 })
 
-describe('hrefFor', () => {
+describe('hrefFor en pageHref', () => {
   it('maakt een link met # ervoor', () => {
     expect(hrefFor('overview')).toBe('#/')
     expect(hrefFor('scripts')).toBe('#/schrifttest')
     expect(hrefFor('settings')).toBe('#/instellingen')
+  })
+
+  it('maakt links naar cursussen en lessen die pageFromHash weer herkent', () => {
+    const lesson = {
+      page: 'lesson',
+      language: 'ko',
+      lesson: 'a1-hangul',
+    } as const
+    expect(pageHref(lesson)).toBe('#/taal/ko/les/a1-hangul')
+    expect(pageFromHash(pageHref(lesson))).toEqual(lesson)
+    expect(pageHref({ page: 'course', language: 'fa' })).toBe('#/taal/fa')
+    expect(pageHref({ page: 'settings' })).toBe('#/instellingen')
+  })
+})
+
+describe('sectionOf', () => {
+  it('rekent cursussen en lessen tot het overzicht', () => {
+    expect(sectionOf({ page: 'course', language: 'es' })).toBe('overview')
+    expect(
+      sectionOf({
+        page: 'lesson',
+        language: 'es',
+        lesson: 'a1-begroeten-hallo',
+      }),
+    ).toBe('overview')
+    expect(sectionOf({ page: 'settings' })).toBe('settings')
   })
 })

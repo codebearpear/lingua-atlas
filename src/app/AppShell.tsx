@@ -1,26 +1,41 @@
 import type { ReactNode } from 'react'
 import { BrandMark, NavIcon } from './Icons'
-import { ROUTES, hrefFor, type Route, type RouteId } from './routes'
+import { ROUTES, hrefFor, sectionOf, type Page, type Route } from './routes'
 
 interface AppShellProps {
-  current: RouteId | null
+  /** De pagina die open is, of null als die niet bestaat. */
+  page: Page | null
   children: ReactNode
 }
 
+/**
+ * Voor schermlezers: "page" als dit precies de open pagina is, "true" als de
+ * open pagina eronder valt, zoals een les onder het overzicht.
+ */
+type Current = 'page' | 'true' | undefined
+
 interface NavLinkProps {
   route: Route
-  active: boolean
+  current: Current
 }
 
 function focusMain(): void {
   document.getElementById('inhoud')?.focus()
 }
 
-function SidebarLink({ route, active }: NavLinkProps) {
+function currentFor(route: Route, page: Page | null): Current {
+  if (page === null || sectionOf(page) !== route.id) {
+    return undefined
+  }
+  return page.page === route.id ? 'page' : 'true'
+}
+
+function SidebarLink({ route, current }: NavLinkProps) {
+  const active = current !== undefined
   return (
     <a
       href={hrefFor(route.id)}
-      aria-current={active ? 'page' : undefined}
+      aria-current={current}
       className={`flex min-h-11 items-center gap-3 rounded-xl px-3 transition-colors ${
         active
           ? 'bg-tint-fill font-semibold text-on-tint'
@@ -37,11 +52,12 @@ function SidebarLink({ route, active }: NavLinkProps) {
   )
 }
 
-function TabLink({ route, active }: NavLinkProps) {
+function TabLink({ route, current }: NavLinkProps) {
+  const active = current !== undefined
   return (
     <a
       href={hrefFor(route.id)}
-      aria-current={active ? 'page' : undefined}
+      aria-current={current}
       className={`flex h-[3.25rem] min-w-[5.5rem] flex-col items-center justify-center gap-0.5 rounded-full px-4 text-caption2 font-semibold transition-colors ${
         active ? 'bg-muted text-tint' : 'text-label'
       }`}
@@ -57,7 +73,7 @@ function TabLink({ route, active }: NavLinkProps) {
  * een glazen zijbalk; op smallere schermen (iPad staand) zweeft onderaan een
  * glazen tabbalk, zoals in iPadOS.
  */
-export function AppShell({ current, children }: AppShellProps) {
+export function AppShell({ page, children }: AppShellProps) {
   return (
     <div className="min-h-dvh">
       <button
@@ -82,7 +98,7 @@ export function AppShell({ current, children }: AppShellProps) {
           <ul className="space-y-0.5">
             {ROUTES.map((route) => (
               <li key={route.id}>
-                <SidebarLink route={route} active={route.id === current} />
+                <SidebarLink route={route} current={currentFor(route, page)} />
               </li>
             ))}
           </ul>
@@ -107,7 +123,7 @@ export function AppShell({ current, children }: AppShellProps) {
         <ul className="flex gap-1">
           {ROUTES.map((route) => (
             <li key={route.id}>
-              <TabLink route={route} active={route.id === current} />
+              <TabLink route={route} current={currentFor(route, page)} />
             </li>
           ))}
         </ul>
