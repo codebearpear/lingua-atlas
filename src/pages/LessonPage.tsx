@@ -1,6 +1,7 @@
 import { CourseLoadError, CourseLoading } from '../app/CourseStates'
 import { count, joinList, regionName } from '../app/format'
 import { SymbolIcon } from '../app/Icons'
+import { MarkedText } from '../app/MarkedText'
 import { pageHref } from '../app/routes'
 import {
   BackLink,
@@ -27,6 +28,7 @@ import type {
   CompiledPack,
   CompiledSentence,
   CompiledWord,
+  InlineText,
   Register,
 } from '../packs/compiled'
 import {
@@ -72,7 +74,13 @@ function regionsLabel(regions: readonly string[] | undefined): string[] {
     : [`vooral in ${joinList(regions.map(regionName))}`]
 }
 
-function Goals({ goals }: { goals: readonly string[] }) {
+function Goals({
+  language,
+  goals,
+}: {
+  language: Language
+  goals: readonly InlineText[]
+}) {
   return (
     <section
       aria-labelledby="doelen-titel"
@@ -82,13 +90,15 @@ function Goals({ goals }: { goals: readonly string[] }) {
         Wat je leert
       </h2>
       <ul className="mt-3 space-y-2">
-        {goals.map((goal) => (
-          <li key={goal} className="flex gap-3">
+        {goals.map((goal, index) => (
+          <li key={index} className="flex gap-3">
             <span
               aria-hidden="true"
               className="mt-[0.5625rem] size-1.5 shrink-0 rounded-full bg-tint"
             />
-            <span>{goal}</span>
+            <span>
+              <MarkedText text={goal} language={language} />
+            </span>
           </li>
         ))}
       </ul>
@@ -132,7 +142,11 @@ function Example({
               {label}
             </span>
           ))}
-          {sentence.notes !== undefined && <span>{sentence.notes}</span>}
+          {sentence.notes !== undefined && (
+            <span>
+              <MarkedText text={sentence.notes} language={language} />
+            </span>
+          )}
         </span>
       )}
     </li>
@@ -147,13 +161,15 @@ function Explanation({
 }: {
   language: Language
   pack: CompiledPack
-  text: string
+  text: InlineText
   examples: readonly string[]
 }) {
   const sentences = sentencesOf(pack, examples)
   return (
     <section className="rounded-card bg-surface p-5">
-      <p className="leading-[1.6]">{text}</p>
+      <p className="leading-[1.6]">
+        <MarkedText text={text} language={language} />
+      </p>
       {sentences.length > 0 && (
         <ul aria-label="Voorbeelden" className="mt-4 space-y-2">
           {sentences.map((sentence) => (
@@ -169,30 +185,46 @@ function Explanation({
   )
 }
 
-function Culture({ text }: { text: string }) {
+function Culture({ language, text }: { language: Language; text: InlineText }) {
   return (
     <section className="rounded-card bg-surface p-5">
       <h2 className="flex items-center gap-2 text-subhead font-semibold text-tint">
         <SymbolIcon name="globe" className="size-5 shrink-0" />
         Cultuur
       </h2>
-      <p className="mt-2 leading-[1.6]">{text}</p>
+      <p className="mt-2 leading-[1.6]">
+        <MarkedText text={text} language={language} />
+      </p>
     </section>
   )
 }
 
 /** "tussenwerpsel · Zeg je bij het weggaan." */
-function wordDetails(word: CompiledWord): string {
-  return [
+function WordDetails({
+  language,
+  word,
+}: {
+  language: Language
+  word: CompiledWord
+}) {
+  const labels = [
     PART_OF_SPEECH_LABELS[word.partOfSpeech],
     word.gender === undefined ? undefined : GENDER_LABELS[word.gender],
     word.ipa,
     ...registerLabels(word.register),
     ...regionsLabel(word.regions),
-    word.notes,
-  ]
-    .filter((part) => part !== undefined)
-    .join(' · ')
+  ].filter((label) => label !== undefined)
+  return (
+    <>
+      {labels.join(' · ')}
+      {word.notes !== undefined && (
+        <>
+          {' · '}
+          <MarkedText text={word.notes} language={language} />
+        </>
+      )}
+    </>
+  )
 }
 
 function Words({
@@ -222,7 +254,7 @@ function Words({
             <p>{word.translations.join(', ')}</p>
           </div>
           <p className="mt-0.5 text-footnote text-secondary">
-            {wordDetails(word)}
+            <WordDetails language={language} word={word} />
           </p>
         </GroupedRow>
       ))}
@@ -324,7 +356,7 @@ function Lesson({
       </header>
 
       <div className="space-y-6">
-        <Goals goals={lesson.goals} />
+        <Goals language={language} goals={lesson.goals} />
         {lesson.blocks.map((block, index) =>
           block.type === 'explanation' ? (
             <Explanation
@@ -335,7 +367,7 @@ function Lesson({
               examples={block.examples}
             />
           ) : (
-            <Culture key={index} text={block.text} />
+            <Culture key={index} language={language} text={block.text} />
           ),
         )}
         {words.length > 0 && <Words language={language} words={words} />}

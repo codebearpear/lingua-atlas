@@ -34,7 +34,11 @@ Het Spaanse pakket bevat een eerste voorbeeld: de eenheid Begroeten en voorstell
 
 Het formaat staat in `src/packs/schema.ts`, de regels in `src/packs/check.ts`. `npm run pakketten` controleert alle pakketten, ook binnen `npm run check` en op GitHub. Een fout houdt publicatie tegen; een waarschuwing niet, maar het onderdeel blijft dan op Concept staan.
 
+In Nederlandse tekst, zoals uitleg, doelen, notities en de teksten van oefeningen, staat de doeltaal tussen sterretjes: `*Hola* betekent hallo.` De app toont die woorden in de taal en schrijfrichting van het pakket, cursief bij het Latijnse schrift, zodat het lettertype, de richting en voorlezen kloppen. Een foute vorm die de uitleg wil laten zien, staat tussen tildes: `Schrijf niet ~adios~, maar *adiós*.` De app streept die rood door. Een sterretje of tilde als gewoon teken schrijf je als `\*` of `\~` (in JSON `\\*` en `\\~`).
+
 De controle kijkt ook per taal naar het schrift: tekst in de doeltaal hoort in het eigen schrift te staan, met bijvoorbeeld de Perzische ی en ک en de halve spatie, de danda in het Hindi, ¿ en ¡ in het Spaans, en in het Birmaans Unicode in plaats van Zawgyi. Zawgyi herkent de controle met [myanmar-tools](https://github.com/google/myanmar-tools) van Google; een kopie daarvan staat in `vendor/myanmar-tools`.
+
+De regels voor het schrift gelden ook voor doeltaal tussen sterretjes, niet voor foute vormen tussen tildes. Bij talen met een eigen schrift waarschuwt de controle als er tekst in dat schrift zonder markering in Nederlandse tekst staat.
 
 Elk onderdeel heeft een validatiestatus:
 

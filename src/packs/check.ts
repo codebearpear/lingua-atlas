@@ -13,6 +13,7 @@
  */
 import { z } from 'zod'
 import { normalizeAnswer } from '../engine/normalize.ts'
+import { parseInline } from './inline.ts'
 import {
   manifestSchema,
   sentencesFileSchema,
@@ -796,8 +797,7 @@ export function checkPack(input: PackInput, options: CheckOptions): PackReport {
       }
     }
 
-    // Tekst in de doeltaal. Nederlandse tekst valt hier buiten: uitleg mag
-    // bijvoorbeeld de Arabische kaf noemen om het verschil te laten zien.
+    // Tekst in de doeltaal. Voor Nederlandse tekst, zie hieronder.
     const target = (
       text: string,
       file: string,
@@ -866,6 +866,89 @@ export function checkPack(input: PackInput, options: CheckOptions): PackReport {
                 answer,
                 file,
                 `${path}.answers[${answerIndex}]`,
+                exercise.id,
+              )
+            })
+          }
+        })
+      })
+    }
+
+    // Nederlandse tekst: uitleg, doelen, notities en de teksten van
+    // oefeningen. Doeltaal staat tussen sterretjes en krijgt de regels van het
+    // schrift; foute vormen tussen tildes laten met opzet het verschil zien en
+    // vallen erbuiten (inline.ts).
+    const dutch = (
+      text: string | undefined,
+      file: string,
+      path: string,
+      itemId: string,
+    ): void => {
+      if (text === undefined) {
+        return
+      }
+      const { parts, problem } = parseInline(text)
+      if (problem !== undefined) {
+        add('error', file, path, problem, itemId)
+        return
+      }
+      const plain: string[] = []
+      for (const part of parts) {
+        if (typeof part === 'string') {
+          plain.push(part)
+        } else if (part.kind === 'target') {
+          report(rules.fragment(part.text), file, path, itemId)
+        }
+      }
+      report(rules.unmarked(plain.join(' ')), file, path, itemId)
+    }
+
+    words.forEach((word, index) => {
+      dutch(word.notes, 'vocabulary.json', `words[${index}].notes`, word.id)
+    })
+    sentences.forEach((sentence, index) => {
+      dutch(
+        sentence.notes,
+        'sentences.json',
+        `sentences[${index}].notes`,
+        sentence.id,
+      )
+    })
+    for (const { file, unit } of units) {
+      unit.goals.forEach((goal, index) => {
+        dutch(goal, file, `goals[${index}]`, unit.id)
+      })
+      unit.lessons.forEach((lesson, lessonIndex) => {
+        const lessonPath = `lessons[${lessonIndex}]`
+        lesson.goals.forEach((goal, index) => {
+          dutch(goal, file, `${lessonPath}.goals[${index}]`, lesson.id)
+        })
+        lesson.blocks.forEach((block, index) => {
+          dutch(
+            block.text,
+            file,
+            `${lessonPath}.blocks[${index}].text`,
+            lesson.id,
+          )
+        })
+        lesson.exercises?.forEach((exercise, exerciseIndex) => {
+          const path = `${lessonPath}.exercises[${exerciseIndex}]`
+          dutch(exercise.instruction, file, `${path}.instruction`, exercise.id)
+          if (exercise.type === 'multiple-choice') {
+            exercise.choices.forEach((choice, choiceIndex) => {
+              dutch(
+                choice.feedback,
+                file,
+                `${path}.choices[${choiceIndex}].feedback`,
+                exercise.id,
+              )
+            })
+          } else {
+            exercise.feedback?.forEach((entry, entryIndex) => {
+              dutch(
+                entry.message,
+                file,
+                `${path}.feedback[${entryIndex}].message`,
                 exercise.id,
               )
             })

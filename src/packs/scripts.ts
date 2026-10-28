@@ -7,11 +7,15 @@
  *   Perzische tekst.
  * - sentence: leestekens van een hele zin in de doeltaal.
  * - romanization: een transliteratie staat in Latijnse letters.
+ * - fragment: doeltaal tussen sterretjes in Nederlandse tekst (zie inline.ts).
+ *   Een woord, een deel van een zin of een losse letter: het schrift en de
+ *   tekens tellen, de regels voor hele woorden en zinnen niet.
+ * - unmarked: het Nederlandse deel van zo'n tekst. Bij een eigen schrift hoort
+ *   tekst in dat schrift gemarkeerd te zijn.
  *
- * De regels gelden alleen voor tekst in de doeltaal. Nederlandse uitleg valt
- * erbuiten, want die mag foute vormen noemen om het verschil te laten zien.
- * Ook bekende foute antwoorden in oefeningen (feedback) vallen erbuiten: die
- * zijn met opzet fout.
+ * Foute vormen tussen tildes in Nederlandse tekst vallen buiten de regels:
+ * die laten met opzet het verschil zien. Net als bekende foute antwoorden in
+ * oefeningen (feedback).
  */
 import {
   ZawgyiConverter,
@@ -24,6 +28,8 @@ export interface LanguageRules {
   characters: (text: string) => TextProblem[]
   sentence: (text: string) => TextProblem[]
   romanization: (text: string) => TextProblem[]
+  fragment: (text: string) => TextProblem[]
+  unmarked: (text: string) => TextProblem[]
 }
 
 const LETTER_OR_MARK = /[\p{L}\p{M}]/u
@@ -143,6 +149,32 @@ function checkRomanization(text: string): TextProblem[] {
     problem(
       'error',
       `Een transliteratie staat in Latijnse letters, maar dit bevat "${other}" (${codePoint(other)}, ${scriptName(other)}).`,
+    ),
+  ]
+}
+
+/**
+ * Tekst in het schrift van het pakket buiten de markering, in Nederlandse
+ * tekst. Bij het Latijnse schrift is dat niet te zien: dat deelt het
+ * Nederlands.
+ */
+function checkUnmarked(
+  text: string,
+  script: string,
+  spec: ScriptSpec,
+): TextProblem[] {
+  if (script === 'Latn') {
+    return []
+  }
+  const letter = spec.letters.source
+  const run = new RegExp(`(?:${letter})(?:${letter}|\\p{M})*`, 'u').exec(text)
+  if (run === null) {
+    return []
+  }
+  return [
+    problem(
+      'warning',
+      `Tekst in ${spec.name} zonder markering: "${run[0]}". Zet doeltaal tussen sterretjes (*\u2026*) en een foute vorm tussen tildes (~\u2026~).`,
     ),
   ]
 }
@@ -364,5 +396,15 @@ export function rulesFor(language: {
     characters: (text) => extra.characters?.(text) ?? [],
     sentence: (text) => extra.sentence?.(text) ?? [],
     romanization: checkRomanization,
+    fragment: (text) => [
+      // Zonder letters, zoals bij een los omgekeerd vraagteken, valt er geen
+      // schrift te controleren.
+      ...(spec === undefined || !LETTER_OR_MARK.test(text)
+        ? []
+        : checkLetters(text, language.script, spec)),
+      ...(extra.characters?.(text) ?? []),
+    ],
+    unmarked: (text) =>
+      spec === undefined ? [] : checkUnmarked(text, language.script, spec),
   }
 }

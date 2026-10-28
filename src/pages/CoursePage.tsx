@@ -2,6 +2,7 @@ import { CourseLoadError, CourseLoading } from '../app/CourseStates'
 import { count } from '../app/format'
 import { SymbolIcon } from '../app/Icons'
 import { LanguageIcon } from '../app/LanguageIcon'
+import { MarkedText } from '../app/MarkedText'
 import { hrefFor, pageHref } from '../app/routes'
 import { BackLink, ContentUnavailable, StatusBadge } from '../app/ui'
 import { usePageTitle } from '../app/usePageTitle'
@@ -73,7 +74,7 @@ function UnitSection({
   unit,
   number,
 }: {
-  language: LanguageCode
+  language: Language
   unit: CompiledUnit
   number: number
 }) {
@@ -88,8 +89,10 @@ function UnitSection({
           {unit.title}
         </h2>
         <ul className="max-w-2xl space-y-1 text-subhead text-secondary">
-          {unit.goals.map((goal) => (
-            <li key={goal}>{goal}</li>
+          {unit.goals.map((goal, index) => (
+            <li key={index}>
+              <MarkedText text={goal} language={language} />
+            </li>
           ))}
         </ul>
         <div className="pt-1">
@@ -104,7 +107,7 @@ function UnitSection({
         {unit.lessons.map((lesson, index) => (
           <LessonRow
             key={lesson.id}
-            language={language}
+            language={language.code}
             lesson={lesson}
             number={index + 1}
           />
@@ -138,7 +141,7 @@ function CourseContent({ language }: { language: Language }) {
       {course.pack.units.map((unit, index) => (
         <UnitSection
           key={unit.id}
-          language={language.code}
+          language={language}
           unit={unit}
           number={index + 1}
         />

@@ -14,12 +14,22 @@ import type {
   CompiledUnit,
   CompiledWord,
 } from './compiled.ts'
+import { parseInline, type InlineText } from './inline.ts'
 import type { Lesson } from './schema.ts'
 import { lowestOf, type EffectiveStatus } from './summary.ts'
 
 /** Zonder bekende status rekent de app met Concept. */
 function statusOf(report: PackReport, id: string): EffectiveStatus {
   return report.itemStatuses[id] ?? 'draft'
+}
+
+/** Nederlandse tekst met de doeltaal gemarkeerd. De controle keurde de markering al goed. */
+function inline(text: string): InlineText {
+  return parseInline(text).parts
+}
+
+function inlineOrNone(text: string | undefined): InlineText | undefined {
+  return text === undefined ? undefined : inline(text)
 }
 
 /** Kenmerken van de voorbeeldzinnen in een les, in volgorde, elk één keer. */
@@ -39,15 +49,15 @@ function compileLesson(report: PackReport, lesson: Lesson): CompiledLesson {
   return {
     id: lesson.id,
     title: lesson.title,
-    goals: lesson.goals,
+    goals: lesson.goals.map(inline),
     blocks: lesson.blocks.map((block) =>
       block.type === 'explanation'
         ? {
             type: 'explanation',
-            text: block.text,
+            text: inline(block.text),
             examples: block.examples ?? [],
           }
-        : { type: 'culture', text: block.text },
+        : { type: 'culture', text: inline(block.text) },
     ),
     words,
     exerciseCount: exercises.length,
@@ -78,7 +88,7 @@ export function compilePack(report: PackReport): CompiledPack {
         title: unit.title,
         level: unit.level,
         order: unit.order,
-        goals: unit.goals,
+        goals: unit.goals.map(inline),
         lessons,
         status: lowestOf([
           statusOf(report, unit.id),
@@ -103,7 +113,7 @@ export function compilePack(report: PackReport): CompiledPack {
           ipa: word.ipa,
           register: word.register,
           regions: word.regions,
-          notes: word.notes,
+          notes: inlineOrNone(word.notes),
           status: statusOf(report, word.id),
         },
       ]),
@@ -118,7 +128,7 @@ export function compilePack(report: PackReport): CompiledPack {
           transliteration: sentence.transliteration,
           register: sentence.register,
           regions: sentence.regions,
-          notes: sentence.notes,
+          notes: inlineOrNone(sentence.notes),
           status: statusOf(report, sentence.id),
         },
       ]),

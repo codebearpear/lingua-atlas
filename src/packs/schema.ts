@@ -12,6 +12,10 @@
  * zijn Nederlands. De regels die over meer dan één veld gaan, zoals
  * verwijzingen en unieke kenmerken, staan in check.ts.
  *
+ * In Nederlandse tekst (uitleg, doelen, notities en de teksten van
+ * oefeningen) staat de doeltaal tussen sterretjes en een foute vorm tussen
+ * tildes: "*Hola* betekent hallo." Zie inline.ts.
+ *
  * Nieuwe soorten inhoud (lees- en luisterteksten, handschriftgegevens) komen
  * in de fasen die ze nodig hebben, met een hogere schemaversie.
  */

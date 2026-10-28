@@ -3,10 +3,16 @@
  * met de status van elk onderdeel erbij (scripts/packs.ts maakt het met
  * compile.ts). De app laadt het pas als je een taal opent.
  *
+ * Nederlandse tekst, zoals uitleg en doelen, komt als InlineText: de doeltaal
+ * en foute vormen staan erin gemarkeerd (zie inline.ts).
+ *
  * Dit bestand bevat alleen typen, zodat de app er niets extra's door laadt.
  */
+import type { InlineText } from './inline.ts'
 import type { Word } from './schema.ts'
 import type { EffectiveStatus } from './summary.ts'
+
+export type { InlinePart, InlineText } from './inline.ts'
 
 export type PartOfSpeech = Word['partOfSpeech']
 export type Gender = NonNullable<Word['gender']>
@@ -22,7 +28,7 @@ export interface CompiledWord {
   ipa?: string
   register?: Register[]
   regions?: string[]
-  notes?: string
+  notes?: InlineText
   status: EffectiveStatus
 }
 
@@ -33,23 +39,23 @@ export interface CompiledSentence {
   transliteration?: string
   register?: Register[]
   regions?: string[]
-  notes?: string
+  notes?: InlineText
   status: EffectiveStatus
 }
 
 export type CompiledBlock =
   | {
       type: 'explanation'
-      text: string
+      text: InlineText
       /** Voorbeeldzinnen, als kenmerken uit sentences. */
       examples: string[]
     }
-  | { type: 'culture'; text: string }
+  | { type: 'culture'; text: InlineText }
 
 export interface CompiledLesson {
   id: string
   title: string
-  goals: string[]
+  goals: InlineText[]
   blocks: CompiledBlock[]
   /** Woorden die de les aanleert, als kenmerken uit words. */
   words: string[]
@@ -66,7 +72,7 @@ export interface CompiledUnit {
   title: string
   level: string
   order: number
-  goals: string[]
+  goals: InlineText[]
   lessons: CompiledLesson[]
   /** De laagste status van de eenheid en haar lessen. */
   status: EffectiveStatus

@@ -85,7 +85,7 @@ function packFiles(): Record<string, unknown> {
           goals: ['Je kunt dag zeggen.'],
           // Uitleg zonder voorbeeldzin geeft een waarschuwing; een les in
           // concept blijft dan Concept.
-          blocks: [{ type: 'explanation', text: 'Adi\u00f3s betekent dag.' }],
+          blocks: [{ type: 'explanation', text: '*Adi\u00f3s* betekent dag.' }],
           words: ['adios'],
         },
       ],
@@ -105,7 +105,7 @@ function packFiles(): Record<string, unknown> {
           blocks: [
             {
               type: 'explanation',
-              text: 'Hola betekent hallo.',
+              text: '*Hola* betekent hallo.',
               examples: ['s-hola'],
             },
             { type: 'culture', text: 'In Spanje geef je vaak twee zoenen.' },
@@ -161,21 +161,34 @@ describe('compilePack', () => {
     expect(first?.lessons[0]).toMatchObject({
       id: 'a1-begroeten-hallo',
       title: 'Hallo',
-      goals: ['Je kunt hallo zeggen.'],
-      blocks: [
-        {
-          type: 'explanation',
-          text: 'Hola betekent hallo.',
-          examples: ['s-hola'],
-        },
-        { type: 'culture', text: 'In Spanje geef je vaak twee zoenen.' },
-      ],
       words: ['hola'],
       exerciseCount: 1,
     })
+    expect(first?.lessons[0]?.blocks[1]).toEqual({
+      type: 'culture',
+      text: ['In Spanje geef je vaak twee zoenen.'],
+    })
     expect(second?.lessons[0]?.blocks).toEqual([
-      { type: 'explanation', text: 'Adi\u00f3s betekent dag.', examples: [] },
+      {
+        type: 'explanation',
+        text: [{ kind: 'target', text: 'Adi\u00f3s' }, ' betekent dag.'],
+        examples: [],
+      },
     ])
+  })
+
+  it('zet Nederlandse tekst om in stukken, met de doeltaal gemarkeerd', () => {
+    const pack = compile(packFiles())
+    const [first] = pack.units
+    expect(first?.goals).toEqual([['Je kunt iemand begroeten.']])
+    expect(first?.lessons[0]?.goals).toEqual([['Je kunt hallo zeggen.']])
+    expect(first?.lessons[0]?.blocks[0]).toEqual({
+      type: 'explanation',
+      text: [{ kind: 'target', text: 'Hola' }, ' betekent hallo.'],
+      examples: ['s-hola'],
+    })
+    expect(pack.words.adios?.notes).toEqual(['Zeg je bij het weggaan.'])
+    expect(pack.words.hola?.notes).toBeUndefined()
   })
 
   it('geeft een les de laagste status van alles wat ze toont', () => {
@@ -217,7 +230,7 @@ describe('compilePack', () => {
       status: 'source-verified',
     })
     expect(pack.words.adios).toMatchObject({
-      notes: 'Zeg je bij het weggaan.',
+      text: 'adi\u00f3s',
       status: 'auto-checked',
     })
     expect(pack.sentences['s-hola']).toMatchObject({

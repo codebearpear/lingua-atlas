@@ -228,3 +228,35 @@ describe('algemene tekstregels', () => {
     expect(checkText("don't", { typography: false })).toEqual([])
   })
 })
+
+describe('doeltaal in Nederlandse tekst', () => {
+  it('controleert het schrift en de tekens van gemarkeerde doeltaal', () => {
+    expect(spanish.fragment('adi\u00f3s')).toEqual([])
+    // Een los leesteken heeft geen letters om te controleren
+    expect(spanish.fragment('\u00bf')).toEqual([])
+    expect(messages(spanish.fragment('h\u043ela'))).toEqual([
+      'error: Letter uit een ander schrift: "\u043e" (U+043E) is Cyrillisch.',
+    ])
+    // ketab met de Arabische kaf
+    expect(messages(persian.fragment('\u0643\u062a\u0627\u0628'))).toEqual([
+      'error: Arabische kaf \u0643 (U+0643). Gebruik de Perzische kaf \u06a9 (U+06A9).',
+    ])
+  })
+
+  it('staat losse letters toe, zoals in uitleg over het schrift', () => {
+    // De Hangul-letter g
+    expect(korean.fragment('\u3131')).toEqual([])
+  })
+
+  it('waarschuwt bij tekst in een eigen schrift zonder markering', () => {
+    // han
+    expect(
+      messages(korean.unmarked('De lettergreep \ud55c klinkt als han.')),
+    ).toEqual([
+      'warning: Tekst in het Koreaanse schrift zonder markering: "\ud55c". Zet doeltaal tussen sterretjes (*\u2026*) en een foute vorm tussen tildes (~\u2026~).',
+    ])
+    expect(persian.unmarked('Gewone Nederlandse uitleg.')).toEqual([])
+    // Het Latijnse schrift deelt het Nederlands; daar valt niets te zien.
+    expect(spanish.unmarked('Hola betekent hallo.')).toEqual([])
+  })
+})

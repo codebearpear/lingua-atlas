@@ -486,7 +486,7 @@ describe('checkPack: taal en schrift', () => {
     expect(messages(check(pack))).toEqual([])
   })
 
-  it('controleert Perzische tekens in Perzische tekst, niet in Nederlandse uitleg', () => {
+  it('controleert Perzische tekens in Perzische tekst, niet in foute vormen in de uitleg', () => {
     const report = check(
       {
         'pack.json': {
@@ -517,7 +517,15 @@ describe('checkPack: taal en schrift', () => {
               text: '\u0643\u062a\u0627\u0628',
               translations: ['boek'],
               partOfSpeech: 'noun',
-              notes: 'Schrijf niet \u0643 (Arabische kaf), maar \u06a9.',
+              notes: 'Schrijf niet ~\u0643~ (Arabische kaf), maar *\u06a9*.',
+            },
+            {
+              id: 'dar',
+              text: '\u062f\u0631',
+              translations: ['in'],
+              partOfSpeech: 'preposition',
+              // Doeltaal zonder markering
+              notes: 'Schrijf het als \u062f\u0631.',
             },
           ],
         },
@@ -526,6 +534,23 @@ describe('checkPack: taal en schrift', () => {
     )
     expect(messages(report)).toEqual([
       'vocabulary.json › words[0].text: Arabische kaf \u0643 (U+0643). Gebruik de Perzische kaf \u06A9 (U+06A9).',
+      'vocabulary.json › words[1].notes: Tekst in het Perzisch-Arabische schrift zonder markering: "\u062f\u0631". Zet doeltaal tussen sterretjes (*…*) en een foute vorm tussen tildes (~…~).',
+    ])
+  })
+
+  it('controleert doeltaal tussen sterretjes in Nederlandse tekst', () => {
+    const pack = fullPack()
+    const [block] = firstLesson(pack).blocks
+    if (block !== undefined) {
+      block.text = '*Hola* betekent hallo, net als *h\u043ela*.'
+    }
+    const [, adios] = pack['vocabulary.json'].words
+    if (adios !== undefined) {
+      adios.notes = 'Zeg je bij *het weggaan.'
+    }
+    expect(messages(check(pack))).toEqual([
+      'vocabulary.json › words[1].notes: Sterretje zonder partner: zet doeltaal tussen twee sterretjes, zoals *hola*. Als teken schrijf je \\*.',
+      'units/a1-begroeten.json › lessons[0].blocks[0].text: Letter uit een ander schrift: "\u043e" (U+043E) is Cyrillisch.',
     ])
   })
 })

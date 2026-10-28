@@ -10,8 +10,8 @@ function lesson(id: string): CompiledLesson {
   return {
     id,
     title: `Les ${id}`,
-    goals: ['Je kunt iets.'],
-    blocks: [{ type: 'explanation', text: 'Uitleg.', examples: [] }],
+    goals: [['Je kunt iets.']],
+    blocks: [{ type: 'explanation', text: ['Uitleg.'], examples: [] }],
     words: [],
     exerciseCount: 0,
     status: 'auto-checked',
@@ -24,7 +24,7 @@ function unit(id: string, order: number, lessons: string[]): CompiledUnit {
     title: `Eenheid ${id}`,
     level: 'A1',
     order,
-    goals: ['Je kunt iets.'],
+    goals: [['Je kunt iets.']],
     lessons: lessons.map(lesson),
     status: 'auto-checked',
   }
