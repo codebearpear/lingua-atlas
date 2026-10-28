@@ -27,12 +27,14 @@ Elke taal heeft een eigen pakket in `content/packs/<taal>/`:
 | ------------------------------------- | ------------------------------------------------------- |
 | `pack.json`                           | Taal, schrift, schrijfrichting, niveaukader en licentie |
 | `sources.json`                        | De bronnen waar onderdelen naar verwijzen               |
-| `vocabulary.json` en `sentences.json` | Woorden en zinnen (komen later)                         |
-| `units/<eenheid>.json`                | Eenheden met lessen en oefeningen (komen later)         |
+| `vocabulary.json` en `sentences.json` | Woorden en zinnen                                       |
+| `units/<eenheid>.json`                | Eenheden met lessen en oefeningen                       |
+
+Het Spaanse pakket bevat een eerste voorbeeld: de eenheid Begroeten en voorstellen, met twee lessen. Lessen volgen kan nog niet; dat komt in een latere fase.
 
 Het formaat staat in `src/packs/schema.ts`, de regels in `src/packs/check.ts`. `npm run pakketten` controleert alle pakketten, ook binnen `npm run check` en op GitHub. Een fout houdt publicatie tegen; een waarschuwing niet, maar het onderdeel blijft dan op Concept staan.
 
-De controle kijkt ook per taal naar het schrift: tekst in de doeltaal hoort in het eigen schrift te staan, met bijvoorbeeld de Perzische ی en ک en de halve spatie, de danda in het Hindi, ¿ en ¡ in het Spaans, en geen tekens die op Zawgyi-codering wijzen in het Birmaans.
+De controle kijkt ook per taal naar het schrift: tekst in de doeltaal hoort in het eigen schrift te staan, met bijvoorbeeld de Perzische ی en ک en de halve spatie, de danda in het Hindi, ¿ en ¡ in het Spaans, en in het Birmaans Unicode in plaats van Zawgyi. Zawgyi herkent de controle met [myanmar-tools](https://github.com/google/myanmar-tools) van Google; een kopie daarvan staat in `vendor/myanmar-tools`.
 
 Elk onderdeel heeft een validatiestatus:
 
@@ -41,11 +43,14 @@ Elk onderdeel heeft een validatiestatus:
 - **Bron-geverifieerd:** nagelopen tegen een genoemde gezaghebbende bron.
 - **Expert-beoordeeld:** beoordeeld door een gekwalificeerde mens, met naam, kwalificatie en datum.
 
+In de app staat onder Instellingen, bij Taalpakketten, per taal wat het pakket bevat en welke status het heeft. Dat is de laagste status van alles in het pakket, zodat de app nooit meer belooft dan voor elk onderdeel geldt.
+
 ## Licenties
 
 - **Code:** MIT-licentie, zie [`LICENSE`](LICENSE).
 - **Lesinhoud** in `content/`: CC BY-NC-SA 4.0, zie [`content/LICENSE.md`](content/LICENSE.md). Onderdelen van anderen houden hun eigen licentie; die staat per onderdeel in het pakket.
 - **Lettertypen:** SIL Open Font License 1.1, meegeleverd via de Fontsource-pakketten.
+- **Code van anderen** in `vendor/`: myanmar-tools van Google, Apache License 2.0, zie [`vendor/myanmar-tools`](vendor/myanmar-tools). Alleen voor de controle van de taalpakketten, niet in de app.
 
 ## Techniek
 

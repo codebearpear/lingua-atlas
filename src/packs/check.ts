@@ -26,10 +26,13 @@ import {
   type Verification,
 } from './schema.ts'
 import { rulesFor } from './scripts.ts'
+import type { EffectiveStatus, PackCounts } from './summary.ts'
 import { checkText, type Severity, type TextProblem } from './text.ts'
 
 export { checkText } from './text.ts'
 export type { Severity } from './text.ts'
+export { STATUS_LABELS, STATUS_ORDER } from './summary.ts'
+export type { EffectiveStatus, PackCounts } from './summary.ts'
 
 export interface Issue {
   severity: Severity
@@ -42,38 +45,11 @@ export interface Issue {
   itemId?: string
 }
 
-export type EffectiveStatus =
-  'draft' | 'auto-checked' | 'source-verified' | 'expert-reviewed'
-
-/** De statussen van laag naar hoog. */
-export const STATUS_ORDER = [
-  'draft',
-  'auto-checked',
-  'source-verified',
-  'expert-reviewed',
-] as const satisfies readonly EffectiveStatus[]
-
-export const STATUS_LABELS: Record<EffectiveStatus, string> = {
-  draft: 'Concept',
-  'auto-checked': 'Automatisch gecontroleerd',
-  'source-verified': 'Bron-geverifieerd',
-  'expert-reviewed': 'Expert-beoordeeld',
-}
-
 export interface PackInput {
   /** Naam van de pakketmap. */
   folder: string
   /** De bestanden in de map: pad met / als scheidingsteken, en de inhoud. */
   files: ReadonlyMap<string, string>
-}
-
-export interface PackCounts {
-  sources: number
-  words: number
-  sentences: number
-  units: number
-  lessons: number
-  exercises: number
 }
 
 export interface PackReport {

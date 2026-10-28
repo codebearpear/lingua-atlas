@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import { packSummaries } from './scripts/packs.ts'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -10,6 +11,8 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
+    // Samenvatting van de taalpakketten voor de app; fouten laten het bouwen mislukken
+    packSummaries(),
     VitePWA({
       // Een nieuwe versie wordt pas actief als je op "Vernieuwen" tikt.
       registerType: 'prompt',

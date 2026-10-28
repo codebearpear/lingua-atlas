@@ -7,8 +7,7 @@
 // onderdeel blijft dan op Concept staan. De regels zelf staan in
 // src/packs/check.ts en het formaat in src/packs/schema.ts.
 
-import { readdir, readFile } from 'node:fs/promises'
-import { join, relative, sep } from 'node:path'
+import { join } from 'node:path'
 import {
   STATUS_LABELS,
   STATUS_ORDER,
@@ -16,26 +15,9 @@ import {
   type PackReport,
 } from '../src/packs/check.ts'
 import { SCHEMA_VERSION } from '../src/packs/schema.ts'
+import { listPacks, readPack, today } from './packs.ts'
 
-const PACKS_DIR = join(import.meta.dirname, '..', 'content', 'packs')
-
-async function readPack(folder: string): Promise<Map<string, string>> {
-  const dir = join(PACKS_DIR, folder)
-  const entries = await readdir(dir, { recursive: true, withFileTypes: true })
-  const names: string[] = []
-  for (const entry of entries) {
-    if (entry.isFile()) {
-      names.push(
-        relative(dir, join(entry.parentPath, entry.name)).split(sep).join('/'),
-      )
-    }
-  }
-  const files = new Map<string, string>()
-  for (const name of names.sort()) {
-    files.set(name, await readFile(join(dir, name), 'utf8'))
-  }
-  return files
-}
+const ROOT = join(import.meta.dirname, '..')
 
 function count(amount: number, one: string, many: string): string {
   return `${amount} ${amount === 1 ? one : many}`
@@ -70,11 +52,7 @@ function statusSummary(report: PackReport): string | undefined {
   return parts.length === 0 ? undefined : parts.join(', ')
 }
 
-const today = new Date().toISOString().slice(0, 10)
-const folders = (await readdir(PACKS_DIR, { withFileTypes: true }))
-  .filter((entry) => entry.isDirectory())
-  .map((entry) => entry.name)
-  .sort()
+const folders = await listPacks(ROOT)
 
 console.log(`Taalpakketten controleren (schemaversie ${SCHEMA_VERSION})`)
 console.log('')
@@ -82,8 +60,8 @@ console.log('')
 let errors = 0
 let warnings = 0
 for (const folder of folders) {
-  const files = await readPack(folder)
-  const report = checkPack({ folder, files }, { today })
+  const files = await readPack(ROOT, folder)
+  const report = checkPack({ folder, files }, { today: today() })
   const packErrors = report.issues.filter(
     (issue) => issue.severity === 'error',
   ).length

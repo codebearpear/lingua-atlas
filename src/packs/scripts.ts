@@ -13,6 +13,10 @@
  * Ook bekende foute antwoorden in oefeningen (feedback) vallen erbuiten: die
  * zijn met opzet fout.
  */
+import {
+  ZawgyiConverter,
+  ZawgyiDetector,
+} from '../../vendor/myanmar-tools/index.js'
 import { codePoint, type Severity, type TextProblem } from './text.ts'
 
 export interface LanguageRules {
@@ -279,15 +283,55 @@ const SPANISH: ExtraRules = {
   ],
 }
 
+/*
+ * Zawgyi-herkenning met myanmar-tools van Google, waarvan een kopie in
+ * vendor/myanmar-tools staat (zie de README daar). Het model geeft de kans dat
+ * een tekst Zawgyi is in plaats van Unicode. De drempel 0,95 komt uit de
+ * README van myanmar-tools: daarboven wordt minder dan 1 procent van de
+ * Unicode-teksten ten onrechte als Zawgyi aangewezen. Op de voorbeeldteksten
+ * van myanmar-tools was dat ongeveer 1 op de 1400 woordgroepen: metta hta ywe,
+ * met de gestapelde medeklinkers van het Pali-leenwoord metta.
+ *
+ * Omdat het model zich dus kan vergissen, geeft het een waarschuwing en geen
+ * fout. Het bouwen gaat door, maar een concept met een waarschuwing blijft
+ * Concept tot iemand het nakijkt.
+ */
+const ZAWGYI_THRESHOLD = 0.95
+const zawgyiDetector = new ZawgyiDetector()
+const zawgyiConverter = new ZawgyiConverter()
+
+function checkZawgyi(text: string): TextProblem[] {
+  if (!/\p{Script=Myanmar}/u.test(text)) {
+    return []
+  }
+  // Tekst die bij het omzetten gelijk blijft, ziet er in beide coderingen
+  // hetzelfde uit. Dan is er niets mis, wat het model ook zegt.
+  const unicode = zawgyiConverter.zawgyiToUnicode(text)
+  if (unicode === text) {
+    return []
+  }
+  if (zawgyiDetector.getZawgyiProbability(text) <= ZAWGYI_THRESHOLD) {
+    return []
+  }
+  return [
+    problem(
+      'warning',
+      `Waarschijnlijk Zawgyi in plaats van Unicode (volgens myanmar-tools). In Unicode wordt dit "${unicode}". Controleer dat en vervang de tekst als het klopt.`,
+    ),
+  ]
+}
+
 const BURMESE: ExtraRules = {
-  characters: (text) =>
-    whenFound(
+  characters: (text) => [
+    ...checkZawgyi(text),
+    ...whenFound(
       text,
       /[\u1050-\u109F\uA9E0-\uA9FF\uAA60-\uAA7F]/u,
       'warning',
       (found) =>
         `Teken buiten het Birmaanse alfabet (${codePoint(found)}), zoals uit het Mon of Shan. Klopt het schrift, en is de tekst geen Zawgyi?`,
     ),
+  ],
 }
 
 const LANGUAGE_RULES: Partial<Record<string, ExtraRules>> = {

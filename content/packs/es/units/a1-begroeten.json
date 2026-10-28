@@ -1,0 +1,206 @@
+{
+  "id": "a1-begroeten",
+  "title": "Begroeten en voorstellen",
+  "level": "A1",
+  "order": 1,
+  "goals": [
+    "Je kunt iemand begroeten en gedag zeggen, op elk moment van de dag.",
+    "Je kunt zeggen hoe je heet en vragen hoe een ander heet."
+  ],
+  "lessons": [
+    {
+      "id": "a1-begroeten-hallo",
+      "title": "Hallo en tot ziens",
+      "goals": [
+        "Je kunt hallo en tot ziens zeggen.",
+        "Je kiest de groet die past bij het moment van de dag."
+      ],
+      "blocks": [
+        {
+          "type": "explanation",
+          "text": "Hola betekent hallo. Je kunt het altijd en tegen iedereen zeggen. Een Spaanse vraag of uitroep begint met een omgekeerd teken: ¿ of ¡.",
+          "examples": ["s-hola-que-tal"]
+        },
+        {
+          "type": "explanation",
+          "text": "Buenos días zeg je ’s ochtends, tot de lunch. Daarna zeg je buenas tardes, en ’s avonds buenas noches. Buenas noches betekent ook welterusten.",
+          "examples": ["s-buenos-dias"]
+        },
+        {
+          "type": "explanation",
+          "text": "Bij het weggaan zeg je adiós. Ook hasta luego (tot straks) hoor je veel, zelfs als je elkaar die dag niet meer ziet.",
+          "examples": ["s-adios-hasta-luego"]
+        },
+        {
+          "type": "culture",
+          "text": "In Spanje wordt laat geluncht, vaak rond twee uur. Buenas tardes hoor je daarom tot ver in de avond."
+        }
+      ],
+      "words": [
+        "hola",
+        "adios",
+        "buenos-dias",
+        "buenas-tardes",
+        "buenas-noches",
+        "hasta-luego"
+      ],
+      "exercises": [
+        {
+          "id": "oef-hola-betekenis",
+          "type": "multiple-choice",
+          "skill": "vocabulary",
+          "direction": "to-dutch",
+          "instruction": "Wat betekent dit?",
+          "prompt": "hola",
+          "items": ["hola"],
+          "choices": [
+            {
+              "text": "hallo",
+              "correct": true
+            },
+            {
+              "text": "tot ziens",
+              "correct": false,
+              "feedback": "Tot ziens is adiós."
+            },
+            {
+              "text": "goedemorgen",
+              "correct": false,
+              "feedback": "Goedemorgen is buenos días."
+            }
+          ]
+        },
+        {
+          "id": "oef-groet-ochtend",
+          "type": "multiple-choice",
+          "skill": "vocabulary",
+          "direction": "to-target",
+          "instruction": "Het is negen uur ’s ochtends. Hoe groet je?",
+          "prompt": "goedemorgen",
+          "items": ["buenos-dias"],
+          "choices": [
+            {
+              "text": "buenos días",
+              "correct": true
+            },
+            {
+              "text": "buenas tardes",
+              "correct": false,
+              "feedback": "Buenas tardes zeg je na de lunch."
+            },
+            {
+              "text": "buenas noches",
+              "correct": false,
+              "feedback": "Buenas noches zeg je ’s avonds."
+            }
+          ]
+        },
+        {
+          "id": "oef-tot-ziens-typen",
+          "type": "typed-answer",
+          "skill": "vocabulary",
+          "direction": "to-target",
+          "instruction": "Vertaal naar het Spaans.",
+          "prompt": "tot ziens",
+          "items": ["adios"],
+          "answers": ["adiós", "hasta luego"],
+          "feedback": [
+            {
+              "answer": "adios",
+              "errorType": "diacritics",
+              "message": "Bijna: adiós heeft een accent op de o."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a1-begroeten-voorstellen",
+      "title": "Jezelf voorstellen",
+      "goals": [
+        "Je kunt zeggen hoe je heet.",
+        "Je kunt vragen hoe iemand heet, met jij en met u."
+      ],
+      "blocks": [
+        {
+          "type": "explanation",
+          "text": "Me llamo betekent ik heet. Letterlijk staat er: ik noem mezelf. Daarna volgt je naam.",
+          "examples": ["s-me-llamo"]
+        },
+        {
+          "type": "explanation",
+          "text": "Spreek je iemand aan met jij, dan vraag je ¿Cómo te llamas? Spreek je iemand aan met u, dan vraag je ¿Cómo se llama usted?",
+          "examples": ["s-como-te-llamas", "s-como-se-llama"]
+        },
+        {
+          "type": "explanation",
+          "text": "Mucho gusto betekent aangenaam. Je kunt ook encantado zeggen als je een man bent, en encantada als je een vrouw bent.",
+          "examples": ["s-mucho-gusto", "s-encantada"]
+        }
+      ],
+      "words": ["me-llamo", "mucho-gusto", "encantado", "encantada"],
+      "exercises": [
+        {
+          "id": "oef-ik-heet-ana",
+          "type": "typed-answer",
+          "skill": "vocabulary",
+          "direction": "to-target",
+          "instruction": "Vertaal naar het Spaans.",
+          "prompt": "Ik heet Ana.",
+          "items": ["s-me-llamo"],
+          "answers": ["Me llamo Ana.", "Soy Ana."]
+        },
+        {
+          "id": "oef-hoe-heet-u",
+          "type": "multiple-choice",
+          "skill": "grammar",
+          "direction": "to-target",
+          "instruction": "Je spreekt een oudere vrouw aan met u. Hoe vraag je hoe ze heet?",
+          "prompt": "Hoe heet u?",
+          "items": ["s-como-se-llama"],
+          "choices": [
+            {
+              "text": "¿Cómo se llama usted?",
+              "correct": true
+            },
+            {
+              "text": "¿Cómo te llamas?",
+              "correct": false,
+              "feedback": "Zo vraag je het aan iemand die je met jij aanspreekt."
+            }
+          ]
+        },
+        {
+          "id": "oef-ana-aangenaam",
+          "type": "multiple-choice",
+          "skill": "grammar",
+          "direction": "to-target",
+          "instruction": "Ana ontmoet Pedro. Wat zegt Ana?",
+          "prompt": "Aangenaam.",
+          "items": ["encantada"],
+          "choices": [
+            {
+              "text": "Encantada.",
+              "correct": true
+            },
+            {
+              "text": "Encantado.",
+              "correct": false,
+              "feedback": "Encantado zegt een man. Ana is een vrouw, dus zij zegt encantada."
+            }
+          ]
+        },
+        {
+          "id": "oef-mucho-gusto-betekenis",
+          "type": "typed-answer",
+          "skill": "vocabulary",
+          "direction": "to-dutch",
+          "instruction": "Wat betekent dit?",
+          "prompt": "mucho gusto",
+          "items": ["mucho-gusto"],
+          "answers": ["aangenaam", "aangenaam kennis te maken"]
+        }
+      ]
+    }
+  ]
+}

@@ -5,6 +5,7 @@ import {
   type Language,
   type LanguageCode,
 } from '../content/languages'
+import { packSummary } from '../content/packs'
 
 /** Een kleur per taal voor het pictogram; alleen ter herkenning, zonder betekenis. */
 const TILE_COLORS: Record<LanguageCode, string> = {
@@ -15,6 +16,15 @@ const TILE_COLORS: Record<LanguageCode, string> = {
   hi: 'from-[#2fbf68] to-[#008932]',
   fa: 'from-[#25b9cc] to-[#008198]',
   my: 'from-[#d660e8] to-[#b02fc2]',
+}
+
+/** Wat er voor een taal klaarstaat. Lessen zijn pas te doen als de lesmotor er is. */
+function lessonsLabel(code: LanguageCode): string {
+  const { lessons } = packSummary(code).counts
+  if (lessons === 0) {
+    return 'Nog geen lessen'
+  }
+  return `${lessons} ${lessons === 1 ? 'les' : 'lessen'} in voorbereiding`
 }
 
 function LanguageTile({ language }: { language: Language }) {
@@ -49,7 +59,7 @@ function LanguageTile({ language }: { language: Language }) {
       </dl>
       <p className="mt-auto pt-3">
         <span className="inline-flex rounded-full bg-muted px-2.5 py-1 text-footnote font-medium text-secondary">
-          Nog geen lessen
+          {lessonsLabel(language.code)}
         </span>
       </p>
     </article>

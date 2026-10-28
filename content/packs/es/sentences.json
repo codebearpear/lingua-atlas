@@ -1,0 +1,61 @@
+{
+  "sentences": [
+    {
+      "id": "s-hola-que-tal",
+      "text": "¡Hola! ¿Qué tal?",
+      "translation": "Hallo! Hoe gaat het?",
+      "level": "A1",
+      "words": ["hola"]
+    },
+    {
+      "id": "s-buenos-dias",
+      "text": "Buenos días, señora.",
+      "translation": "Goedemorgen, mevrouw.",
+      "level": "A1",
+      "words": ["buenos-dias"]
+    },
+    {
+      "id": "s-adios-hasta-luego",
+      "text": "Adiós, hasta luego.",
+      "translation": "Dag, tot straks.",
+      "level": "A1",
+      "words": ["adios", "hasta-luego"]
+    },
+    {
+      "id": "s-me-llamo",
+      "text": "Me llamo Ana.",
+      "translation": "Ik heet Ana.",
+      "level": "A1",
+      "words": ["me-llamo"]
+    },
+    {
+      "id": "s-como-te-llamas",
+      "text": "¿Cómo te llamas?",
+      "translation": "Hoe heet jij?",
+      "level": "A1",
+      "register": ["informal"]
+    },
+    {
+      "id": "s-como-se-llama",
+      "text": "¿Cómo se llama usted?",
+      "translation": "Hoe heet u?",
+      "level": "A1",
+      "register": ["formal"]
+    },
+    {
+      "id": "s-mucho-gusto",
+      "text": "Mucho gusto, Pedro.",
+      "translation": "Aangenaam, Pedro.",
+      "level": "A1",
+      "words": ["mucho-gusto"]
+    },
+    {
+      "id": "s-encantada",
+      "text": "Encantada.",
+      "translation": "Aangenaam.",
+      "level": "A1",
+      "words": ["encantada"],
+      "notes": "Zegt een vrouw."
+    }
+  ]
+}

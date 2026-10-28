@@ -165,6 +165,42 @@ describe('Birmaans', () => {
     expect(checkText('\u1014\u1031')).toEqual([])
   })
 
+  it('waarschuwt bij tekst die myanmar-tools als Zawgyi herkent', () => {
+    // htamin (rijst), in Zawgyi
+    expect(
+      messages(burmese.characters('\u1011\u1019\u1004\u1039\u1038')),
+    ).toEqual([
+      'warning: Waarschijnlijk Zawgyi in plaats van Unicode (volgens myanmar-tools). In Unicode wordt dit "\u1011\u1019\u1004\u103a\u1038". Controleer dat en vervang de tekst als het klopt.',
+    ])
+  })
+
+  it('laat gewone Birmaanse tekst in Unicode met rust', () => {
+    // mingalaba
+    expect(
+      burmese.characters(
+        '\u1019\u1004\u103a\u1039\u1002\u101c\u102c\u1015\u102b',
+      ),
+    ).toEqual([])
+    // kyezu tin ba de
+    expect(
+      burmese.characters(
+        '\u1000\u103b\u1031\u1038\u1007\u1030\u1038\u1010\u1004\u103a\u1015\u102b\u1010\u101a\u103a',
+      ),
+    ).toEqual([])
+    // myanma bhasa, de eigen naam van de taal in pack.json
+    expect(
+      burmese.characters(
+        '\u1019\u103c\u1014\u103a\u1019\u102c\u1018\u102c\u101e\u102c',
+      ),
+    ).toEqual([])
+  })
+
+  it('slaat tekst over die in beide coderingen hetzelfde is', () => {
+    // i, het teken voor de bezitsvorm. Het model geeft hier een hoge score,
+    // maar het teken is in Zawgyi en Unicode gelijk.
+    expect(burmese.characters('\u104f')).toEqual([])
+  })
+
   it('waarschuwt bij tekens buiten het Birmaanse alfabet', () => {
     expect(messages(burmese.characters('\u1060'))).toEqual([
       'warning: Teken buiten het Birmaanse alfabet (U+1060), zoals uit het Mon of Shan. Klopt het schrift, en is de tekst geen Zawgyi?',

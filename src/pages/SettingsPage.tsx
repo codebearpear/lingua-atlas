@@ -2,6 +2,9 @@ import { THEME_PREFERENCES, type ThemePreference } from '../app/theme'
 import { setThemePreference, useThemePreference } from '../app/themeStore'
 import { GroupedRow, GroupedSection, PageHeader } from '../app/ui'
 import { usePageTitle } from '../app/usePageTitle'
+import { LANGUAGES, type Language } from '../content/languages'
+import { packSummary } from '../content/packs'
+import { STATUS_LABELS, lowestStatus, type PackCounts } from '../packs/summary'
 
 const THEME_LABELS: Record<ThemePreference, string> = {
   system: 'Automatisch',
@@ -41,6 +44,42 @@ function ThemeSegments() {
   )
 }
 
+function count(amount: number, one: string, many: string): string {
+  return `${amount} ${amount === 1 ? one : many}`
+}
+
+/** Wat er in een pakket staat, in een regel. */
+function contentLine(counts: PackCounts): string {
+  if (counts.units === 0 && counts.words === 0 && counts.sentences === 0) {
+    return 'Alleen taalgegevens'
+  }
+  return [
+    count(counts.lessons, 'les', 'lessen'),
+    count(counts.words, 'woord', 'woorden'),
+    count(counts.sentences, 'zin', 'zinnen'),
+    count(counts.exercises, 'oefening', 'oefeningen'),
+  ].join(' · ')
+}
+
+function PackRow({ language }: { language: Language }) {
+  const summary = packSummary(language.code)
+  return (
+    <GroupedRow>
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
+        <div className="min-w-0">
+          <p>{language.dutchName}</p>
+          <p className="text-footnote text-secondary">
+            {contentLine(summary.counts)}
+          </p>
+        </div>
+        <p className="text-subhead text-secondary">
+          {STATUS_LABELS[lowestStatus(summary)]}
+        </p>
+      </div>
+    </GroupedRow>
+  )
+}
+
 export function SettingsPage() {
   usePageTitle('Instellingen')
 
@@ -57,6 +96,16 @@ export function SettingsPage() {
           <GroupedRow>
             <ThemeSegments />
           </GroupedRow>
+        </GroupedSection>
+
+        <GroupedSection
+          id="pakketten"
+          title="Taalpakketten"
+          footer="De status is de laagste van alles in het pakket. Concept: nog niet gecontroleerd. Automatisch gecontroleerd: de vorm klopt, zoals de tekens en de antwoorden; de taal zelf heeft nog geen mens nagekeken. Bron-geverifieerd: nagelopen tegen een gezaghebbende bron. Expert-beoordeeld: beoordeeld door een deskundige."
+        >
+          {LANGUAGES.map((language) => (
+            <PackRow key={language.code} language={language} />
+          ))}
         </GroupedSection>
 
         <GroupedSection

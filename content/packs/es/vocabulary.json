@@ -1,0 +1,90 @@
+{
+  "words": [
+    {
+      "id": "hola",
+      "text": "hola",
+      "translations": ["hallo", "hoi"],
+      "partOfSpeech": "interjection",
+      "level": "A1",
+      "examples": ["s-hola-que-tal"]
+    },
+    {
+      "id": "adios",
+      "text": "adiós",
+      "translations": ["tot ziens", "dag"],
+      "partOfSpeech": "interjection",
+      "level": "A1",
+      "notes": "Zeg je bij het weggaan.",
+      "examples": ["s-adios-hasta-luego"]
+    },
+    {
+      "id": "buenos-dias",
+      "text": "buenos días",
+      "translations": ["goedemorgen"],
+      "partOfSpeech": "phrase",
+      "level": "A1",
+      "notes": "Zeg je ’s ochtends, tot de lunch.",
+      "examples": ["s-buenos-dias"]
+    },
+    {
+      "id": "buenas-tardes",
+      "text": "buenas tardes",
+      "translations": ["goedemiddag"],
+      "partOfSpeech": "phrase",
+      "level": "A1",
+      "notes": "Zeg je van de lunch tot de avond."
+    },
+    {
+      "id": "buenas-noches",
+      "text": "buenas noches",
+      "translations": ["goedenavond", "welterusten"],
+      "partOfSpeech": "phrase",
+      "level": "A1",
+      "notes": "Zeg je ’s avonds en voor het slapengaan."
+    },
+    {
+      "id": "hasta-luego",
+      "text": "hasta luego",
+      "translations": ["tot straks", "tot later"],
+      "partOfSpeech": "phrase",
+      "level": "A1",
+      "examples": ["s-adios-hasta-luego"]
+    },
+    {
+      "id": "me-llamo",
+      "text": "me llamo",
+      "translations": ["ik heet"],
+      "partOfSpeech": "phrase",
+      "level": "A1",
+      "notes": "Letterlijk: ik noem mezelf.",
+      "examples": ["s-me-llamo"]
+    },
+    {
+      "id": "mucho-gusto",
+      "text": "mucho gusto",
+      "translations": ["aangenaam"],
+      "partOfSpeech": "phrase",
+      "level": "A1",
+      "examples": ["s-mucho-gusto"]
+    },
+    {
+      "id": "encantado",
+      "text": "encantado",
+      "translations": ["aangenaam"],
+      "partOfSpeech": "adjective",
+      "level": "A1",
+      "gender": "masculine",
+      "notes": "Zegt een man."
+    },
+    {
+      "id": "encantada",
+      "text": "encantada",
+      "translations": ["aangenaam"],
+      "partOfSpeech": "adjective",
+      "level": "A1",
+      "gender": "feminine",
+      "notes": "Zegt een vrouw.",
+      "examples": ["s-encantada"]
+    }
+  ]
+}
