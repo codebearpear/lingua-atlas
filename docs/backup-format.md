@@ -83,7 +83,7 @@ Per antwoord:
 | ------------ | ----------------------------------------------------------------------------------- |
 | `exerciseId` | Het kenmerk van de oefening.                                                        |
 | `type`       | `multiple-choice` of `typed-answer`.                                                |
-| `direction`  | `to-dutch` (herkennen: antwoord in het Nederlands) of `to-target` (zelf maken).     |
+| `direction`  | `to-dutch` (antwoord in het Nederlands) of `to-target` (antwoord in de doeltaal).   |
 | `items`      | De woorden of zinnen die de oefening toetst, als kenmerken uit het pakket.          |
 | `given`      | Wat je typte, of de tekst van je keuze.                                             |
 | `verdict`    | Het oordeel van de antwoordcontrole: `correct`, `almost` of `wrong`.                |
@@ -92,6 +92,8 @@ Per antwoord:
 | `answeredAt` | Wanneer je het antwoord controleerde.                                               |
 
 Wat de oefening toetste (`type`, `direction`, `items`) staat bij elk antwoord, zodat het antwoord te begrijpen blijft als het taalpakket later verandert.
+
+Je herhaalkaarten staan niet in de back-up. De app berekent ze uit deze antwoorden, in volgorde van `answeredAt` (`src/engine/memory.ts`). Na terugzetten of samenvoegen kloppen ze daardoor vanzelf.
 
 ## Het controlegetal
 

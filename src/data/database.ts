@@ -44,7 +44,7 @@ export interface MetaEntry {
 export interface RoundAnswer {
   exerciseId: string
   type: CompiledExercise['type']
-  /** to-dutch is herkennen, to-target produceren. */
+  /** to-dutch: antwoord in het Nederlands; to-target: in de doeltaal. */
   direction: CompiledExercise['direction']
   /** De woorden of zinnen die de oefening toetst, als kenmerken. */
   items: string[]

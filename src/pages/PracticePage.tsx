@@ -555,8 +555,8 @@ function Summary({
         title="Jouw antwoorden"
         footer={
           saveFailed
-            ? 'Je antwoorden tellen nog niet mee voor herhalen; dat komt in een volgende versie.'
-            : 'Je antwoorden worden op dit apparaat bewaard en gaan mee in je back-up. Ze tellen nog niet mee voor herhalen; dat komt in een volgende versie.'
+            ? 'Antwoorden die niet bewaard zijn, tellen niet mee voor herhalen.'
+            : 'Je antwoorden worden op dit apparaat bewaard en gaan mee in je back-up. Ze bepalen wanneer je deze woorden herhaalt; dat zie je in het overzicht onder Vandaag.'
         }
       >
         {state.attempts.map((attempt) => {

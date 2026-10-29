@@ -1,6 +1,12 @@
 import { useEffect, useState } from 'react'
 import { CourseLoadError, CourseLoading } from '../app/CourseStates'
-import { count, joinList, momentLabel, regionName } from '../app/format'
+import {
+  count,
+  dueLabel,
+  joinList,
+  momentLabel,
+  regionName,
+} from '../app/format'
 import { SymbolIcon } from '../app/Icons'
 import { MarkedText } from '../app/MarkedText'
 import { pageHref } from '../app/routes'
@@ -12,6 +18,7 @@ import {
   PRIMARY_BUTTON,
   StatusBadge,
 } from '../app/ui'
+import { useMemory, type MemorySnapshot } from '../app/useMemory'
 import { usePageTitle } from '../app/usePageTitle'
 import { VERDICT_ORDER, VERDICTS } from '../app/verdicts'
 import {
@@ -31,6 +38,13 @@ import type { PracticeRound } from '../data/database'
 import { logError } from '../data/errorLog'
 import { lastFinishedRound, roundCounts } from '../data/rounds'
 import type { Verdict } from '../engine/answers'
+import {
+  cardKey,
+  endOfDay,
+  isDue,
+  isLearning,
+  type MemorySkill,
+} from '../engine/memory'
 import type {
   CompiledLesson,
   CompiledPack,
@@ -235,15 +249,83 @@ function WordDetails({
   )
 }
 
+const SKILL_LABELS: Record<MemorySkill, string> = {
+  recognition: 'Herkennen',
+  production: 'Zelf maken',
+}
+
+/** Wanneer een woord terugkomt, per herhaalkaart die je ervan hebt. */
+function WordMemory({
+  language,
+  item,
+  memory,
+}: {
+  language: LanguageCode
+  item: string
+  memory: MemorySnapshot
+}) {
+  const endOfToday = endOfDay(memory.now)
+  const cards = (['recognition', 'production'] as const).flatMap((skill) => {
+    const card = memory.cards.get(cardKey(language, item, skill))
+    return card === undefined ? [] : [card]
+  })
+  if (cards.length === 0) {
+    return null
+  }
+  return (
+    <p className="mt-2 flex flex-wrap gap-1.5 text-footnote">
+      {cards.map((card) => {
+        const due = isDue(card, memory.now, endOfToday)
+        return (
+          <span
+            key={card.skill}
+            className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-0.5"
+          >
+            <span className="text-secondary">{SKILL_LABELS[card.skill]}:</span>
+            <span className={due ? 'font-semibold text-tint' : ''}>
+              {due
+                ? 'nu aan de beurt'
+                : dueLabel(
+                    card.fsrs.due.getTime(),
+                    memory.now,
+                    !isLearning(card),
+                  )}
+            </span>
+          </span>
+        )
+      })}
+    </p>
+  )
+}
+
 function Words({
   language,
   words,
+  memory,
 }: {
   language: Language
   words: readonly CompiledWord[]
+  /** Je herhaalkaarten, als die er zijn. */
+  memory: MemorySnapshot | null | undefined
 }) {
+  const practiced =
+    memory !== null &&
+    memory !== undefined &&
+    words.some((word) =>
+      (['recognition', 'production'] as const).some((skill) =>
+        memory.cards.has(cardKey(language.code, word.id, skill)),
+      ),
+    )
   return (
-    <GroupedSection id="woorden" title="Woorden in deze les">
+    <GroupedSection
+      id="woorden"
+      title="Woorden in deze les"
+      footer={
+        practiced
+          ? 'Bij een woord dat je hebt geoefend, staat wanneer je het weer herhaalt.'
+          : undefined
+      }
+    >
       {words.map((word) => (
         <GroupedRow key={word.id}>
           <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-0.5">
@@ -264,6 +346,13 @@ function Words({
           <p className="mt-0.5 text-footnote text-secondary">
             <WordDetails language={language} word={word} />
           </p>
+          {memory !== null && memory !== undefined && (
+            <WordMemory
+              language={language.code}
+              item={word.id}
+              memory={memory}
+            />
+          )}
         </GroupedRow>
       ))}
     </GroupedSection>
@@ -429,6 +518,7 @@ function Lesson({
 }) {
   const { unit, lesson, number, previous, next } = place
   const words = wordsOf(pack, lesson.words)
+  const memory = useMemory()
 
   return (
     <article aria-labelledby="les-titel" className="max-w-2xl">
@@ -462,7 +552,9 @@ function Lesson({
             <Culture key={index} language={language} text={block.text} />
           ),
         )}
-        {words.length > 0 && <Words language={language} words={words} />}
+        {words.length > 0 && (
+          <Words language={language} words={words} memory={memory} />
+        )}
         {lesson.exercises.length > 0 && (
           <Practice language={language.code} lesson={lesson} />
         )}

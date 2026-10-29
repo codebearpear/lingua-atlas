@@ -8,8 +8,9 @@ import type { Database } from './database'
 /**
  * De tabellen die in een back-up gaan: je oefenrondes. Het foutenlogboek en de
  * gegevens over de database horen bij het apparaat en gaan niet mee. Komt er
- * een tabel met jouw gegevens bij, zoals herhaalkaarten, dan komt hij ook
- * hier, en in readBackup.ts een controle van de records.
+ * een tabel met jouw gegevens bij, dan komt hij ook hier, en in readBackup.ts
+ * een controle van de records. Herhaalkaarten zijn geen tabel: de app
+ * berekent ze uit de oefenrondes (src/engine/memory.ts).
  */
 export const BACKUP_TABLES: readonly string[] = ['rounds']
 

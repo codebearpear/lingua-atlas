@@ -32,12 +32,87 @@ function calendarDay(time: number, timeZone: string | undefined): string {
   return `${part('year')}-${part('month')}-${part('day')}`
 }
 
-/** De dag voor een kalenderdag, ook over een maand- of jaargrens. */
-function dayBefore(day: string): string {
+/** Een kalenderdag (JJJJ-MM-DD) als dagnummer, om dagen te kunnen tellen. */
+function dayNumber(day: string): number {
   const [year = 0, month = 1, date = 1] = day.split('-').map(Number)
-  return new Date(Date.UTC(year, month - 1, date - 1))
-    .toISOString()
-    .slice(0, 10)
+  return Date.UTC(year, month - 1, date) / 86_400_000
+}
+
+/**
+ * Hoeveel kalenderdagen het ene tijdstip na het andere ligt, ook over een
+ * maand- of jaargrens en de overgang naar zomer- of wintertijd.
+ */
+function daysAfter(
+  time: number,
+  reference: number,
+  timeZone: string | undefined,
+): number {
+  return (
+    dayNumber(calendarDay(time, timeZone)) -
+    dayNumber(calendarDay(reference, timeZone))
+  )
+}
+
+function clockTime(time: number, timeZone: string | undefined): string {
+  return new Intl.DateTimeFormat('nl-NL', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone,
+  }).format(time)
+}
+
+/** "26 oktober", met het jaar erbij als dat een ander is dan dat van reference. */
+function dateLabel(
+  time: number,
+  reference: number,
+  timeZone: string | undefined,
+): string {
+  const sameYear =
+    calendarDay(time, timeZone).slice(0, 4) ===
+    calendarDay(reference, timeZone).slice(0, 4)
+  return new Intl.DateTimeFormat('nl-NL', {
+    day: 'numeric',
+    month: 'long',
+    year: sameYear ? undefined : 'numeric',
+    timeZone,
+  }).format(time)
+}
+
+/**
+ * Wanneer een herhaalkaart terugkomt: "nu", "vandaag om 14:20", "morgen",
+ * "over 3 dagen" of "op 12 november". Met byDay telt alleen de dag, zoals bij
+ * een gewone kaart, die je de hele dag kunt herhalen; anders ook de tijd,
+ * zoals bij een kaart in de leerfase.
+ */
+export function dueLabel(
+  due: number,
+  now: number,
+  byDay: boolean,
+  timeZone?: string,
+): string {
+  const days = daysAfter(due, now, timeZone)
+  if (byDay) {
+    if (days <= 0) {
+      return 'nu'
+    }
+    if (days === 1) {
+      return 'morgen'
+    }
+    return days < 14
+      ? `over ${days} dagen`
+      : `op ${dateLabel(due, now, timeZone)}`
+  }
+  if (due <= now) {
+    return 'nu'
+  }
+  const clock = clockTime(due, timeZone)
+  if (days === 0) {
+    return `vandaag om ${clock}`
+  }
+  if (days === 1) {
+    return `morgen om ${clock}`
+  }
+  return `op ${dateLabel(due, now, timeZone)} om ${clock}`
 }
 
 /**
@@ -50,24 +125,13 @@ export function momentLabel(
   now: number = Date.now(),
   timeZone?: string,
 ): string {
-  const clock = new Intl.DateTimeFormat('nl-NL', {
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone,
-  }).format(time)
-  const day = calendarDay(time, timeZone)
-  const today = calendarDay(now, timeZone)
-  if (day === today) {
+  const clock = clockTime(time, timeZone)
+  const days = daysAfter(time, now, timeZone)
+  if (days === 0) {
     return `vandaag om ${clock}`
   }
-  if (day === dayBefore(today)) {
+  if (days === -1) {
     return `gisteren om ${clock}`
   }
-  const date = new Intl.DateTimeFormat('nl-NL', {
-    day: 'numeric',
-    month: 'long',
-    year: day.slice(0, 4) === today.slice(0, 4) ? undefined : 'numeric',
-    timeZone,
-  }).format(time)
-  return `op ${date} om ${clock}`
+  return `op ${dateLabel(time, now, timeZone)} om ${clock}`
 }
